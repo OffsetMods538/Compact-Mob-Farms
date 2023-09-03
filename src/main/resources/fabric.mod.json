@@ -1,0 +1,44 @@
+{
+	"schemaVersion": 1,
+	"id": "compact-mob-farms",
+	"version": "${modVersion}",
+	"name": "Compact Mob Farm",
+	"description": "Adds a way to farm mob drops in a 1 block space",
+	"authors": [
+		"OffsetMonkey538"
+	],
+	"contact": {
+		"sources": "https://github.com/OffsetMods538/Compact-Mob-Farms",
+		"issues": "https://github.com/OffsetMods538/Compact-Mob-Farms/issues",
+		"homepage": "https://modrinth.com/mod/compact-mob-farms"
+	},
+	"license": "MIT",
+	"icon": "assets/compact-mob-farms/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"top.offsetmonkey538.compactmobfarms.CompactMobFarms"
+		],
+		"client": [
+			"top.offsetmonkey538.compactmobfarms.CompactMobFarmsClient"
+		],
+		"fabric-datagen": [
+			"top.offsetmonkey538.compactmobfarms.datagen.CompactMobFarmsDatagen"
+		],
+		"preLaunch": [
+			"com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
+		]
+	},
+	"mixins": [
+		"compact-mob-farms.mixins.json",
+		{
+			"config": "compact-mob-farms.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"accessWidener": "compact-mob-farms.accesswidener",
+	"depends": {
+		"fabric-api": "*",
+		"minecraft": "${supportedMinecraftVersions}"
+	}
+}
