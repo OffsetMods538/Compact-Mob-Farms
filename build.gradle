@@ -76,7 +76,8 @@ dependencies {
 	mappings "net.fabricmc:yarn:${outlet.yarnVersion(project.minecraft_version)}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${outlet.loaderVersion()}"
 	// Fabric API
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${outlet.fapiVersion(project.minecraft_version)}"
+	//modImplementation "net.fabricmc.fabric-api:fabric-api:${outlet.fapiVersion(project.minecraft_version)}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:0.87.0+1.20.1"
 
 	// Uncomment for including a module of fabric api
 	// includeModImplementation fabricApi.module("fabric-api-base", outlet.fapiVersion(project.minecraft_version))
