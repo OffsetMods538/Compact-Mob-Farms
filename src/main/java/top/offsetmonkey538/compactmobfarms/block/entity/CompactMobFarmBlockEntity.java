@@ -12,6 +12,7 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.inventory.CompactMobFarmInventory;
 
@@ -20,6 +21,10 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
     public CompactMobFarmBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.COMPACT_MOB_FARM, pos, state);
+    }
+
+    public static void tick(World world, BlockPos pos, BlockState state, CompactMobFarmBlockEntity blockEntity) {
+        // TODO
     }
 
     @Override
