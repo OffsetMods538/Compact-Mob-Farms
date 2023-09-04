@@ -9,9 +9,7 @@ public class CompactMobFarmsDatagen implements DataGeneratorEntrypoint {
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
         final FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
-        /*
-        Example:
-        pack.addProvider(MyEnglishLanguageProvider::new)
-         */
+        pack.addProvider(ModBlockLootTableProvider::new);
+        pack.addProvider(ModBlockTagProvider::new);
     }
 }

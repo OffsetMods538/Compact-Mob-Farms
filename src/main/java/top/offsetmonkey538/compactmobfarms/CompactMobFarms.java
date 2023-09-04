@@ -4,9 +4,8 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
-
+import top.offsetmonkey538.compactmobfarms.block.entity.ModBlockEntityTypes;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 
 public class CompactMobFarms implements ModInitializer {
@@ -18,6 +17,7 @@ public class CompactMobFarms implements ModInitializer {
 		// Do stuff
 		ModBlocks.register();
 		ModItems.register();
+		ModBlockEntityTypes.register();
 	}
 
 	public static Identifier id(String path) {

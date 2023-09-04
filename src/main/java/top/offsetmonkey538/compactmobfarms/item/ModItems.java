@@ -1,8 +1,12 @@
 package top.offsetmonkey538.compactmobfarms.item;
 
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.util.Rarity;
+import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 
 import static top.offsetmonkey538.compactmobfarms.CompactMobFarms.id;
 
@@ -11,10 +15,7 @@ public final class ModItems {
 
     }
 
-    /*
-     Example usage:
-     public static final Item MY_ITEM = register(new Item(new FabricItemSettings()), "my_item");
-     */
+    public static final BlockItem COMPACT_MOB_FARM = register(new BlockItem(ModBlocks.COMPACT_MOB_FARM, new FabricItemSettings().rarity(Rarity.UNCOMMON)), "compact_mob_farm");
 
     private static <T extends Item> T register(T item, String name) {
         return Registry.register(Registries.ITEM, id(name), item);
