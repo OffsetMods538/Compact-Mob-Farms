@@ -15,7 +15,8 @@ public final class ModItems {
 
     }
 
-    public static final BlockItem COMPACT_MOB_FARM = register(new BlockItem(ModBlocks.COMPACT_MOB_FARM, new FabricItemSettings().rarity(Rarity.UNCOMMON)), "compact_mob_farm");
+    public static final BlockItem       COMPACT_MOB_FARM = register(new BlockItem(ModBlocks.COMPACT_MOB_FARM, new FabricItemSettings().rarity(Rarity.UNCOMMON)), "compact_mob_farm");
+    public static final SampleTakerItem SAMPLE_TAKER     = register(new SampleTakerItem(new FabricItemSettings().maxCount(1)), "sample_taker");
 
     private static <T extends Item> T register(T item, String name) {
         return Registry.register(Registries.ITEM, id(name), item);
