@@ -9,9 +9,11 @@ import net.minecraft.data.client.BlockStateModelGenerator;
 import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.client.ModelIds;
 import net.minecraft.data.client.Models;
+import net.minecraft.data.client.SimpleModelSupplier;
 import net.minecraft.data.client.TextureKey;
 import net.minecraft.data.client.TextureMap;
 import net.minecraft.util.Identifier;
+import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 
 import static top.offsetmonkey538.compactmobfarms.CompactMobFarms.*;
@@ -23,11 +25,12 @@ public class ModModelProvider extends FabricModelProvider {
 
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-
+        blockStateModelGenerator.registerSimpleState(ModBlocks.COMPACT_MOB_FARM);
     }
 
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
+        itemModelGenerator.writer.accept(ModelIds.getItemModelId(ModItems.COMPACT_MOB_FARM), new SimpleModelSupplier(ModelIds.getBlockModelId(ModBlocks.COMPACT_MOB_FARM)));
         Models.GENERATED.upload(ModelIds.getItemModelId(ModItems.SAMPLE_TAKER), TextureMap.layer0(ModItems.SAMPLE_TAKER), itemModelGenerator.writer, this::sampleTakerJsonGenerator);
         for (int i = 1; i <= 10; i++) {
             itemModelGenerator.register(ModItems.SAMPLE_TAKER, "_filled_" + i, Models.GENERATED);
