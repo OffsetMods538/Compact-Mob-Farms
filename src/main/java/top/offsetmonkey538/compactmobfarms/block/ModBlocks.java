@@ -21,6 +21,7 @@ public final class ModBlocks {
         return Registry.register(Registries.BLOCK, id(name), block);
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void register() {
         // Registers blocks by loading the class.
     }

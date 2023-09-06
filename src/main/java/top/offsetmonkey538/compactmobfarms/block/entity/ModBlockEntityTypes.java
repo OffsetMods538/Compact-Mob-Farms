@@ -19,6 +19,7 @@ public final class ModBlockEntityTypes {
         return Registry.register(Registries.BLOCK_ENTITY_TYPE, id(name), block);
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void register() {
         // Registers blocks by loading the class.
     }

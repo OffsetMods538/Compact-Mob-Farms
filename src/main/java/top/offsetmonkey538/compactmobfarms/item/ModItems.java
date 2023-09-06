@@ -21,6 +21,7 @@ public final class ModItems {
         return Registry.register(Registries.ITEM, id(name), item);
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void register() {
         // Registers items by loading the class.
     }

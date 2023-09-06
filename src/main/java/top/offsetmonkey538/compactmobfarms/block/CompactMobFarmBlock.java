@@ -17,7 +17,6 @@ public class CompactMobFarmBlock extends BlockWithEntity {
         super(settings);
     }
 
-
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
@@ -32,6 +31,6 @@ public class CompactMobFarmBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, ModBlockEntityTypes.COMPACT_MOB_FARM, (world1, pos, state1, blockEntity) -> CompactMobFarmBlockEntity.tick(world1, pos, state1, blockEntity));
+        return checkType(type, ModBlockEntityTypes.COMPACT_MOB_FARM, CompactMobFarmBlockEntity::tick);
     }
 }
