@@ -47,7 +47,8 @@ public interface CompactMobFarmInventory extends Inventory {
 
         for (int i = 0; i < size(); i++) {
             ItemStack storedStack = getStack(i);
-            if (!storedStack.isOf(stack.getItem()) || !storedStack.getOrCreateNbt().equals(stack.getOrCreateNbt())) continue;
+
+            if (!storedStack.isOf(stack.getItem()) || (stack.getNbt() != null && !stack.getNbt().equals(storedStack.getNbt()))) continue;
 
             int newCount = stack.getCount() + storedStack.getCount();
             if (newCount > getMaxCountPerStack()) newCount = getMaxCountPerStack();
