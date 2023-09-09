@@ -22,18 +22,25 @@ public interface CompactMobFarmInventory extends Inventory {
 
     @Override
     default ItemStack getStack(int slot) {
+        if (slot >= size()) return ItemStack.EMPTY;
         return getItems().get(slot);
     }
 
     @Override
     default ItemStack removeStack(int slot, int amount) {
-        if (getStack(slot).getCount() - amount <= 0) return getItems().remove(slot);
+        if (slot >= size()) return ItemStack.EMPTY;
+        ItemStack removedStack;
 
-        ItemStack itemStack = Inventories.splitStack(getItems(), slot, amount);
-        if (!itemStack.isEmpty()) {
+        if (getStack(slot).getCount() - amount <= 0) {
+            removedStack = getItems().remove(slot);
+        } else {
+            removedStack = Inventories.splitStack(getItems(), slot, amount);
+        }
+
+        if (!removedStack.isEmpty()) {
             this.markDirty();
         }
-        return itemStack;
+        return removedStack;
     }
 
     @Override
@@ -63,6 +70,11 @@ public interface CompactMobFarmInventory extends Inventory {
 
     @Override
     default void setStack(int slot, ItemStack stack) {
+        if (slot >= size()) return;
+        if (stack.isEmpty()) {
+            getItems().remove(slot);
+            return;
+        }
         getItems().set(slot, stack);
         this.markDirty();
     }
