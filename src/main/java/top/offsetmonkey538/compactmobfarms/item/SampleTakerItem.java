@@ -68,10 +68,13 @@ public class SampleTakerItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        if (getSamplesCollected(stack).isEmpty()) return;
+        final List<UUID> samplesCollected = getSamplesCollected(stack);
+        final EntityType<?> sampledEntity = getSampledEntityType(stack);
 
-        tooltip.add(Text.translatable(getTranslationKey() + ".tooltip.amount", getSamplesCollected(stack).size()));
-        tooltip.add(Text.translatable(getTranslationKey() + ".tooltip.type", getSampledEntityType(stack).getName()));
+        if (samplesCollected.isEmpty() || sampledEntity == null) return;
+
+        tooltip.add(Text.translatable(getTranslationKey() + ".tooltip.amount", samplesCollected.size()));
+        tooltip.add(Text.translatable(getTranslationKey() + ".tooltip.type", sampledEntity.getName()));
     }
 
     @Override
