@@ -98,7 +98,11 @@ public class SampleTakerItem extends Item {
     }
 
     public static EntityType<?> getSampledEntityType(ItemStack stack) {
-        return Registries.ENTITY_TYPE.get(getSampledEntityId(stack));
+        final Identifier id = getSampledEntityId(stack);
+
+        if (id == null || !Registries.ENTITY_TYPE.containsId(id)) return null;
+
+        return Registries.ENTITY_TYPE.get(id);
     }
 
     public static List<UUID> getSamplesCollected(ItemStack stack) {
