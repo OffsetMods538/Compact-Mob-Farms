@@ -2,9 +2,13 @@ package top.offsetmonkey538.compactmobfarms.block.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -19,14 +23,18 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import top.offsetmonkey538.compactmobfarms.accessor.EntityAccessor;
 import top.offsetmonkey538.compactmobfarms.inventory.CompactMobFarmInventory;
+import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 
 public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMobFarmInventory, NamedScreenHandlerFactory {
+    private int killTimer = 0;
     final List<ItemStack> dropInventory = new ArrayList<>(1);
     private final SimpleInventory sampleTaker = new SimpleInventory(1) {
         @Override
@@ -50,38 +58,36 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         super(ModBlockEntityTypes.COMPACT_MOB_FARM, pos, state);
     }
 
-    // int timer = 0;
     public static void tick(World world, BlockPos pos, BlockState state, CompactMobFarmBlockEntity blockEntity) {
-        // // fixme: this is temporary and just for testing
+        // fixme: this is temporary and just for testing also remove this comment before committing you dumbass
 
-        // if (world.isClient()) return;
-
-
-        // blockEntity.timer++;
-        // if (blockEntity.timer < 20) return;
-
-        // final ItemStack sampleTaker = blockEntity.getSampleTaker();
-        // if (sampleTaker == null) return;
-
-        // final EntityType<?> livingEntityType = SampleTakerItem.getSampledEntityType(sampleTaker);
-        // if (livingEntityType == null) return;
-
-        // final Entity entity = livingEntityType.create(blockEntity.getWorld());
-        // if (!(entity instanceof LivingEntity livingEntity)) return;
-
-        // if (!(world instanceof ServerWorld serverWorld)) return;
+        if (world.isClient()) return;
 
 
-        // FakePlayer player = FakePlayer.get(serverWorld);
+        blockEntity.killTimer++;
+        if (blockEntity.killTimer < 20) return;
 
-        // DamageSource damageSource = livingEntity.getDamageSources().playerAttack(player);
-        // Identifier identifier = livingEntity.getLootTable();
-        // LootTable lootTable = world.getServer().getLootManager().getLootTable(identifier);
-        // LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder(serverWorld).add(LootContextParameters.THIS_ENTITY, livingEntity).add(LootContextParameters.ORIGIN, livingEntity.getPos()).add(LootContextParameters.DAMAGE_SOURCE, damageSource).addOptional(LootContextParameters.KILLER_ENTITY, damageSource.getAttacker()).addOptional(LootContextParameters.DIRECT_KILLER_ENTITY, damageSource.getSource());
-        // builder = builder.add(LootContextParameters.LAST_DAMAGE_PLAYER, player).luck(player.getLuck());
-        // LootContextParameterSet lootContextParameterSet = builder.build(LootContextTypes.ENTITY);
-        // lootTable.generateLoot(lootContextParameterSet, livingEntity.getLootTableSeed(), blockEntity::addStack);
-        // blockEntity.timer = 0;
+        final ItemStack sampleTaker = blockEntity.getSampleTaker();
+        if (sampleTaker == null) return;
+
+        final EntityType<?> livingEntityType = SampleTakerItem.getSampledEntityType(sampleTaker);
+        if (livingEntityType == null) return;
+
+        final Entity entity = livingEntityType.create(blockEntity.getWorld());
+        if (!(entity instanceof LivingEntity livingEntity)) return;
+
+        if (!(world instanceof ServerWorld serverWorld)) return;
+
+
+        FakePlayer player = FakePlayer.get(serverWorld);
+
+        // player.setStackInHand(player.getActiveHand(), stack); // TODO: Store a sword to attack with
+
+        ((EntityAccessor) livingEntity).compact_mob_farms$setDropMethod(blockEntity::addStack);
+
+        livingEntity.damage(livingEntity.getDamageSources().playerAttack(player), Float.MAX_VALUE); // TODO: Store a sword to attack with
+
+        blockEntity.killTimer = 0;
     }
 
 
