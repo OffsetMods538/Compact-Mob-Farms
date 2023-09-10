@@ -7,6 +7,11 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -28,6 +33,19 @@ public class CompactMobFarmBlock extends BlockWithEntity {
 
     public CompactMobFarmBlock(Settings settings) {
         super(settings);
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient()) return ActionResult.SUCCESS;
+
+        NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
+
+        if (screenHandlerFactory == null) return ActionResult.SUCCESS;
+
+        player.openHandledScreen(screenHandlerFactory);
+        return ActionResult.SUCCESS;
     }
 
     @Nullable

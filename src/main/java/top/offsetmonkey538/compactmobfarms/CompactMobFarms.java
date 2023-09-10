@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.ModBlockEntityTypes;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
+import top.offsetmonkey538.compactmobfarms.screen.ModScreenHandlers;
 
 public class CompactMobFarms implements ModInitializer {
 	public static final String MOD_ID = "compact-mob-farms";
@@ -18,6 +19,7 @@ public class CompactMobFarms implements ModInitializer {
 		ModBlocks.register();
 		ModItems.register();
 		ModBlockEntityTypes.register();
+		ModScreenHandlers.register();
 	}
 
 	public static Identifier id(String path) {
