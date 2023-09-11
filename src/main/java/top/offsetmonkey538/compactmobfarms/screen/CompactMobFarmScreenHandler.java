@@ -13,26 +13,28 @@ import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
 
 public class CompactMobFarmScreenHandler extends ScreenHandler {
     private final ScreenHandlerContext context;
-    private final Inventory inventory;
 
     public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(1), ScreenHandlerContext.EMPTY);
+        this(syncId, playerInventory, new SimpleInventory(1), new SimpleInventory(1), ScreenHandlerContext.EMPTY);
     }
 
-    public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, ScreenHandlerContext context) {
+    public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, Inventory sampleTaker, Inventory sword, ScreenHandlerContext context) {
         super(ModScreenHandlers.COMPACT_MOB_FARM_SCREEN_HANDLER, syncId);
 
         this.context = context;
-        this.inventory = inventory;
-        inventory.onOpen(playerInventory.player);
+
+        sampleTaker.onOpen(playerInventory.player);
+        sword.onOpen(playerInventory.player);
 
 
-        this.addSlot(new Slot(inventory, 0, 10, 10) {
+        this.addSlot(new Slot(sampleTaker, 0, 10, 10) {
             @Override
             public boolean canInsert(ItemStack stack) {
                 return context.get((world, pos) -> SampleTakerItem.getSamplesCollected(stack).size() >= 10, false);
             }
         });
+
+        this.addSlot(new Slot(sword, 0, 25, 10));
 
 
         // The player inventory
@@ -54,8 +56,8 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         final ItemStack originalStack = slot.getStack();
         ItemStack newStack = originalStack.copy();
 
-        if (slotId < this.inventory.size() && !this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) newStack = ItemStack.EMPTY;
-        if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) newStack = ItemStack.EMPTY;
+        if (slotId < 2 && !this.insertItem(originalStack, 1, this.slots.size(), true)) newStack = ItemStack.EMPTY;
+        if (!this.insertItem(originalStack, 0, 1, false)) newStack = ItemStack.EMPTY;
 
         if (originalStack.isEmpty()) slot.setStack(ItemStack.EMPTY);
 
@@ -66,6 +68,6 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return this.inventory.canPlayerUse(player) && canUse(context, player, ModBlocks.COMPACT_MOB_FARM);
+        return canUse(context, player, ModBlocks.COMPACT_MOB_FARM);
     }
 }
