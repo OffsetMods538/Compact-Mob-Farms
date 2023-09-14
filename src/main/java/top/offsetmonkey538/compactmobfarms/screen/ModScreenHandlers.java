@@ -1,8 +1,8 @@
 package top.offsetmonkey538.compactmobfarms.screen;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 
@@ -15,8 +15,8 @@ public final class ModScreenHandlers {
 
     public static final ScreenHandlerType<CompactMobFarmScreenHandler> COMPACT_MOB_FARM_SCREEN_HANDLER = register(CompactMobFarmScreenHandler::new, "sample_taker");
 
-    private static <T extends ScreenHandler> ScreenHandlerType<T> register(ScreenHandlerType.Factory<T> factory, String name) {
-        return Registry.register(Registries.SCREEN_HANDLER, id(name), new ScreenHandlerType<>(factory, FeatureFlags.VANILLA_FEATURES));
+    private static <T extends ScreenHandler> ScreenHandlerType<T> register(ExtendedScreenHandlerType.ExtendedFactory<T> factory, String name) {
+        return Registry.register(Registries.SCREEN_HANDLER, id(name), new ExtendedScreenHandlerType<>(factory));
     }
 
     @SuppressWarnings("EmptyMethod")

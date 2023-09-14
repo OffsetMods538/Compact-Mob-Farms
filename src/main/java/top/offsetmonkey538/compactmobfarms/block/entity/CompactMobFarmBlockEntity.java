@@ -3,6 +3,10 @@ package top.offsetmonkey538.compactmobfarms.block.entity;
 import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -19,26 +23,30 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.accessor.EntityAccessor;
 import top.offsetmonkey538.compactmobfarms.inventory.CompactMobFarmInventory;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
+import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 
 import static top.offsetmonkey538.compactmobfarms.CompactMobFarms.*;
 
-public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMobFarmInventory, NamedScreenHandlerFactory {
+public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMobFarmInventory, ExtendedScreenHandlerFactory {
     private int killTimer = 0;
     private float maxEntityHealth = -1;
     private float currentEntityHealth = 0;
@@ -88,7 +96,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
 
         blockEntity.killTimer++;
-        if (blockEntity.killTimer < 20) return;
+        if (blockEntity.killTimer < 10) return;
 
         blockEntity.checkHealthAndKillEntity();
 
@@ -102,6 +110,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         if (this.currentEntity == null && !setCurrentEntity()) return;
 
         if (maxEntityHealth == -1) maxEntityHealth = currentEntity.getMaxHealth();
+        if (currentEntityHealth == -1) currentEntityHealth = maxEntityHealth;
 
         final FakePlayer player = FakePlayer.get(serverWorld);
         if (this.getSword() != null) {
@@ -125,6 +134,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         if (sampleTaker == null) return false;
 
         final EntityType<?> livingEntityType = SampleTakerItem.getSampledEntityType(sampleTaker);
+        sendUpdatePacket(livingEntityType);
         if (livingEntityType == null) return false;
 
         final Entity entity = livingEntityType.create(this.getWorld());
@@ -132,6 +142,26 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
         this.currentEntity = livingEntity;
         return true;
+    }
+
+    private void sendUpdatePacket(EntityType<?> newEntity) {
+        if (newEntity == null) {
+            sendPacketToNearbyPlayers(ModPackets.GUI_ENTITY_REMOVED, PacketByteBufs.empty());
+            return;
+        }
+
+
+        PacketByteBuf buf = PacketByteBufs.create();
+
+        buf.writeRegistryValue(Registries.ENTITY_TYPE, newEntity);
+
+        sendPacketToNearbyPlayers(ModPackets.GUI_ENTITY_CHANGED, buf);
+    }
+
+    private void sendPacketToNearbyPlayers(Identifier packet, PacketByteBuf buf) {
+        for (ServerPlayerEntity player : PlayerLookup.tracking(this)) {
+            ServerPlayNetworking.send(player, packet, buf);
+        }
     }
 
     private float getAttackDamage(ItemStack sword, PlayerEntity player, LivingEntity target) {
@@ -158,6 +188,12 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     @Override
     public Text getDisplayName() {
         return Text.translatable(getCachedState().getBlock().getTranslationKey());
+    }
+
+    @Override
+    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        buf.writeBoolean(currentEntity != null);
+        if (currentEntity != null) buf.writeRegistryValue(Registries.ENTITY_TYPE, currentEntity.getType());
     }
 
     @Override
@@ -205,6 +241,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_LISTENERS);
         currentEntity = null;
         maxEntityHealth = -1;
+        currentEntityHealth = -1;
     }
 
     public ItemStack getSampleTaker() {

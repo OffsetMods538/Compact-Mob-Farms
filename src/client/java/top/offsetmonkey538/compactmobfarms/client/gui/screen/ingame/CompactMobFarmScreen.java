@@ -2,6 +2,10 @@ package top.offsetmonkey538.compactmobfarms.client.gui.screen.ingame;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -9,6 +13,7 @@ import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 
 public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("minecraft:textures/gui/container/dispenser.png"); // TODO: create an actual texture
+    private LivingEntity entity;
 
     public CompactMobFarmScreen(CompactMobFarmScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -17,6 +22,7 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
     @Override
     protected void init() {
         super.init();
+        setEntity(handler.getEntityType());
 
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
     }
@@ -31,6 +37,13 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
         int y = (height - backgroundHeight) / 2;
 
         context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight);
+
+
+        if (entity == null) return;
+
+        int entityX = x + 80;
+        int entityY = y + 80;
+        InventoryScreen.drawEntity(context, entityX, entityY, 20, entityX - mouseX, entityY - mouseY, entity);
     }
 
     @Override
@@ -40,5 +53,24 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
         super.render(context, mouseX, mouseY, delta);
 
         drawMouseoverTooltip(context, mouseX, mouseY);
+    }
+
+    public void setEntity(EntityType<?> entityType) {
+        if (entityType == null) {
+            this.entity = null;
+            return;
+        }
+
+        final Entity entity = entityType.create(client.world);
+        if (!(entity instanceof LivingEntity livingEntity)) {
+            this.entity = null;
+            return;
+        }
+
+        this.entity = livingEntity;
+    }
+
+    public void clearEntity() {
+        this.entity = null;
     }
 }

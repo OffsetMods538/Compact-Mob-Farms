@@ -1,10 +1,13 @@
 package top.offsetmonkey538.compactmobfarms.screen;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
@@ -12,10 +15,13 @@ import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
 
 public class CompactMobFarmScreenHandler extends ScreenHandler {
+    private EntityType<?> entityType;
     private final ScreenHandlerContext context;
 
-    public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory) {
+    public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
         this(syncId, playerInventory, new SimpleInventory(1), new SimpleInventory(1), ScreenHandlerContext.EMPTY);
+
+        if (buf.readBoolean()) this.entityType = buf.readRegistryValue(Registries.ENTITY_TYPE);
     }
 
     public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, Inventory sampleTaker, Inventory sword, ScreenHandlerContext context) {
@@ -69,5 +75,9 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
     @Override
     public boolean canUse(PlayerEntity player) {
         return canUse(context, player, ModBlocks.COMPACT_MOB_FARM);
+    }
+
+    public EntityType<?> getEntityType() {
+        return entityType;
     }
 }
