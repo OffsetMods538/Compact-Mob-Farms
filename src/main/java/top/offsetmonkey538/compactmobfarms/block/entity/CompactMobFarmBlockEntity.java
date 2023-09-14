@@ -104,7 +104,10 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         if (maxEntityHealth == -1) maxEntityHealth = currentEntity.getMaxHealth();
 
         final FakePlayer player = FakePlayer.get(serverWorld);
-        if (this.getSword() != null) player.setStackInHand(Hand.MAIN_HAND, this.getSword());
+        if (this.getSword() != null) {
+            player.setStackInHand(Hand.MAIN_HAND, this.getSword());
+            if (this.getSword().damage(1, world.random, null)) this.sword.clear();
+        }
 
         float attackDamage = getAttackDamage(this.getSword(), player, currentEntity);
 
