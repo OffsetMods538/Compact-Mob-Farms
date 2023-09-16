@@ -113,6 +113,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         final FakePlayer player = FakePlayer.get(serverWorld);
         if (this.getSword() != null) {
             player.setStackInHand(Hand.MAIN_HAND, this.getSword());
+            if(EnchantmentHelper.getFireAspect(player) > 0) currentEntity.setFireTicks(1);
             if (this.getSword().damage(1, world.random, null)) this.sword.clear();
         }
 
