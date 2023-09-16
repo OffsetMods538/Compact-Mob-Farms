@@ -47,7 +47,6 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         });
         sampleTaker.onOpen(player);
         sword.onOpen(player);
-        testing.onOpen(player);
 
 
         this.addSlot(new Slot(sampleTaker, 0, 10, 10) {
