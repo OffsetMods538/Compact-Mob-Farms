@@ -3,6 +3,7 @@ package top.offsetmonkey538.compactmobfarms.client.gui.screen.ingame;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -23,6 +24,18 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
     protected void init() {
         super.init();
         setEntity(handler.getEntityType());
+
+        // TODO: use translations for this
+        addDrawableChild(
+                CyclingButtonWidget
+                        .onOffBuilder(Text.of("On"), Text.of("Off"))
+                        .initially(handler.isTurnedOn())
+                        .omitKeyText()
+                        .build(100, 100, 60, 60, null, (button, value) -> {
+                            if (client == null || client.interactionManager == null) return;
+                            this.client.interactionManager.clickButton(handler.syncId, value ? 1 : 0);
+                        })
+        );
 
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
     }

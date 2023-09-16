@@ -45,6 +45,7 @@ import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 
 public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMobFarmInventory, ExtendedScreenHandlerFactory {
     private int killTimer = 0;
+    private boolean isTurnedOn = true;
     private float maxEntityHealth = -1;
     private float currentEntityHealth = 0;
     private LivingEntity currentEntity = null;
@@ -92,6 +93,11 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     public static void tick(World world, BlockPos pos, BlockState state, CompactMobFarmBlockEntity blockEntity) {
         if (world.isClient()) return;
 
+        // Set entity if it doesn't exist
+        if (blockEntity.currentEntity == null && !blockEntity.setCurrentEntity()) return;
+
+        if (!blockEntity.isTurnedOn) return;
+
 
         blockEntity.killTimer++;
         if (blockEntity.killTimer < 10) return;
@@ -103,9 +109,6 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
     private void checkHealthAndKillEntity() {
         if (!(world instanceof ServerWorld serverWorld)) return;
-
-        // Set entity if it doesn't exist
-        if (this.currentEntity == null && !setCurrentEntity()) return;
 
         if (maxEntityHealth == -1) maxEntityHealth = currentEntity.getMaxHealth();
         if (currentEntityHealth == -1) currentEntityHealth = maxEntityHealth;
@@ -199,6 +202,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        buf.writeBoolean(isTurnedOn);
         buf.writeBoolean(currentEntity != null);
         if (currentEntity != null) buf.writeRegistryValue(Registries.ENTITY_TYPE, currentEntity.getType());
     }
@@ -210,6 +214,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         nbt.put("DropInventory", dropInventoryNbt);
         nbt.put("SampleTaker", sampleTaker.toNbtList());
         nbt.put("Sword", sword.toNbtList());
+        nbt.putBoolean("TurnedOn", isTurnedOn);
 
         super.writeNbt(nbt);
     }
@@ -222,6 +227,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
                 .forEach(itemNbt -> this.dropInventory.add(ItemStack.fromNbt((NbtCompound) itemNbt)));
         sampleTaker.readNbtList(nbt.getList("SampleTaker", NbtElement.COMPOUND_TYPE));
         sword.readNbtList(nbt.getList("Sword", NbtElement.COMPOUND_TYPE));
+        isTurnedOn = nbt.getBoolean("TurnedOn");
     }
 
     @Override
@@ -257,5 +263,9 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
     public ItemStack getSword() {
         return sword.getStack(0);
+    }
+
+    public void setTurnedOn(boolean turnedOn) {
+        this.isTurnedOn = turnedOn;
     }
 }

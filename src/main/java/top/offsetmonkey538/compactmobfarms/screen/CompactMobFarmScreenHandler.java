@@ -15,18 +15,21 @@ import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import top.offsetmonkey538.compactmobfarms.CompactMobFarms;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
 
 public class CompactMobFarmScreenHandler extends ScreenHandler {
     private EntityType<?> entityType;
+    private boolean turnedOn;
     private final ScreenHandlerContext context;
     private BiConsumer<Identifier, PacketByteBuf> sender = null;
 
     public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
         this(syncId, playerInventory, new SimpleInventory(1), new SimpleInventory(1), ScreenHandlerContext.EMPTY);
 
+        turnedOn = buf.readBoolean();
         if (buf.readBoolean()) this.entityType = buf.readRegistryValue(Registries.ENTITY_TYPE);
     }
 
@@ -73,6 +76,8 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int slotId) {
+        // fixme: it don't do the worky
+
         final Slot slot = this.getSlot(slotId);
 
         final ItemStack originalStack = slot.getStack();
@@ -101,6 +106,22 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
             if (!(world.getBlockEntity(pos) instanceof CompactMobFarmBlockEntity entity)) return;
             entity.removePacketSender(sender);
         });
+    }
+
+    @Override
+    public boolean onButtonClick(PlayerEntity player, int id) {
+        if (id > 1) return false;
+
+        context.run(((world, pos) -> {
+            if (!(world.getBlockEntity(pos) instanceof CompactMobFarmBlockEntity blockEntity)) return;
+            blockEntity.setTurnedOn(id == 1);
+        }));
+
+        return true;
+    }
+
+    public boolean isTurnedOn() {
+        return turnedOn;
     }
 
     public EntityType<?> getEntityType() {
