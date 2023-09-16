@@ -2,10 +2,9 @@ package top.offsetmonkey538.compactmobfarms.block.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -44,13 +43,12 @@ import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 
-import static top.offsetmonkey538.compactmobfarms.CompactMobFarms.*;
-
 public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMobFarmInventory, ExtendedScreenHandlerFactory {
     private int killTimer = 0;
     private float maxEntityHealth = -1;
     private float currentEntityHealth = 0;
     private LivingEntity currentEntity = null;
+    private final List<BiConsumer<Identifier, PacketByteBuf>> packetSenders = new ArrayList<>();
     final List<ItemStack> dropInventory = new ArrayList<>(1);
     private final SimpleInventory sampleTaker = new SimpleInventory(1) {
         @Override
@@ -146,7 +144,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
     private void sendUpdatePacket(EntityType<?> newEntity) {
         if (newEntity == null) {
-            sendPacketToNearbyPlayers(ModPackets.GUI_ENTITY_REMOVED, PacketByteBufs.empty());
+            sendPacket(ModPackets.GUI_ENTITY_REMOVED, PacketByteBufs.create());
             return;
         }
 
@@ -155,13 +153,21 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
         buf.writeRegistryValue(Registries.ENTITY_TYPE, newEntity);
 
-        sendPacketToNearbyPlayers(ModPackets.GUI_ENTITY_CHANGED, buf);
+        sendPacket(ModPackets.GUI_ENTITY_CHANGED, buf);
     }
 
-    private void sendPacketToNearbyPlayers(Identifier packet, PacketByteBuf buf) {
-        for (ServerPlayerEntity player : PlayerLookup.tracking(this)) {
-            ServerPlayNetworking.send(player, packet, buf);
+    private void sendPacket(Identifier packet, PacketByteBuf buf) {
+        for (BiConsumer<Identifier, PacketByteBuf> sender : packetSenders) {
+            sender.accept(packet, buf);
         }
+    }
+
+    public void registerPacketSender(BiConsumer<Identifier, PacketByteBuf> sender) {
+        this.packetSenders.add(sender);
+    }
+
+    public void removePacketSender(BiConsumer<Identifier, PacketByteBuf> sender) {
+        this.packetSenders.remove(sender);
     }
 
     private float getAttackDamage(ItemStack sword, PlayerEntity player, LivingEntity target) {

@@ -1,5 +1,7 @@
 package top.offsetmonkey538.compactmobfarms.screen;
 
+import java.util.function.BiConsumer;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -11,12 +13,16 @@ import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
+import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
 
 public class CompactMobFarmScreenHandler extends ScreenHandler {
     private EntityType<?> entityType;
     private final ScreenHandlerContext context;
+    private BiConsumer<Identifier, PacketByteBuf> sender = null;
 
     public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
         this(syncId, playerInventory, new SimpleInventory(1), new SimpleInventory(1), ScreenHandlerContext.EMPTY);
@@ -27,10 +33,21 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
     public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, Inventory sampleTaker, Inventory sword, ScreenHandlerContext context) {
         super(ModScreenHandlers.COMPACT_MOB_FARM_SCREEN_HANDLER, syncId);
 
-        this.context = context;
+        PlayerEntity player = playerInventory.player;
 
-        sampleTaker.onOpen(playerInventory.player);
-        sword.onOpen(playerInventory.player);
+        this.context = context;
+        context.run((world, pos) -> {
+            if (!(world.getBlockEntity(pos) instanceof CompactMobFarmBlockEntity entity && player instanceof ServerPlayerEntity serverPlayer)) return;
+            sender = (id, buf) -> {
+                buf.writeByte(syncId);
+                ServerPlayNetworking.send(serverPlayer, id, buf);
+            };
+
+            entity.registerPacketSender(sender);
+        });
+        sampleTaker.onOpen(player);
+        sword.onOpen(player);
+        testing.onOpen(player);
 
 
         this.addSlot(new Slot(sampleTaker, 0, 10, 10) {
@@ -75,6 +92,16 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
     @Override
     public boolean canUse(PlayerEntity player) {
         return canUse(context, player, ModBlocks.COMPACT_MOB_FARM);
+    }
+
+    @Override
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
+
+        context.run((world, pos) -> {
+            if (!(world.getBlockEntity(pos) instanceof CompactMobFarmBlockEntity entity)) return;
+            entity.removePacketSender(sender);
+        });
     }
 
     public EntityType<?> getEntityType() {

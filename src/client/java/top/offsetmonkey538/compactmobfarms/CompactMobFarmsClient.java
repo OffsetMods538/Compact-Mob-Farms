@@ -34,11 +34,14 @@ public class CompactMobFarmsClient implements ClientModInitializer {
 
 			EntityType<?> livingEntityType = buf.readRegistryValue(Registries.ENTITY_TYPE);
 
+			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
+
 			screen.setEntity(livingEntityType);
 		});
 
 		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_ENTITY_REMOVED, (client, handler, buf, responseSender) -> {
 			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
+			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
 
 			screen.clearEntity();
 		});
