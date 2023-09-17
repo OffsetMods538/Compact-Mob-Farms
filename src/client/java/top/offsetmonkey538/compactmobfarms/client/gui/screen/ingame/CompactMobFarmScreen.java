@@ -12,8 +12,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 
+import static top.offsetmonkey538.compactmobfarms.CompactMobFarms.*;
+
 public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHandler> {
-    private static final Identifier TEXTURE = new Identifier("minecraft:textures/gui/container/dispenser.png"); // TODO: create an actual texture
+    private static final Identifier TEXTURE = id("textures/gui/container/compact_mob_farm.png");
     private LivingEntity entity;
 
     public CompactMobFarmScreen(CompactMobFarmScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -31,7 +33,7 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
                         .onOffBuilder(Text.of("On"), Text.of("Off"))
                         .initially(handler.isTurnedOn())
                         .omitKeyText()
-                        .build(100, 100, 60, 60, null, (button, value) -> {
+                        .build(x + 10,  y + 14, 20, 20, null, (button, value) -> {
                             if (client == null || client.interactionManager == null) return;
                             this.client.interactionManager.clickButton(handler.syncId, value ? 1 : 0);
                         })
@@ -54,9 +56,12 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
 
         if (entity == null) return;
 
-        int entityX = x + 80;
-        int entityY = y + 80;
-        InventoryScreen.drawEntity(context, entityX, entityY, 20, entityX - mouseX, entityY - mouseY, entity);
+        int entityX = x + 118;
+        int entityY = y + 20;
+        // TODO: I don't like that it's following the cursor.
+        //  Create a new method and make it render the entity like uhh isometrically or something similar
+        //  Also it's not in the correct place because why would it be ._.
+        InventoryScreen.drawEntity(context, entityX, entityY, 46, entityX - mouseX, entityY - mouseY, entity);
     }
 
     @Override

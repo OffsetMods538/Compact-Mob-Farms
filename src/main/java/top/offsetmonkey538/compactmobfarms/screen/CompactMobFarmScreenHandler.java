@@ -15,7 +15,6 @@ import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import top.offsetmonkey538.compactmobfarms.CompactMobFarms;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
@@ -52,14 +51,14 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         sword.onOpen(player);
 
 
-        this.addSlot(new Slot(sampleTaker, 0, 10, 10) {
+        this.addSlot(new Slot(sampleTaker, 0, 32, 16) {
             @Override
             public boolean canInsert(ItemStack stack) {
                 return context.get((world, pos) -> SampleTakerItem.getSamplesCollected(stack).size() >= 10, false);
             }
         });
 
-        this.addSlot(new Slot(sword, 0, 25, 10));
+        this.addSlot(new Slot(sword, 0, 71, 16));
 
 
         // The player inventory
