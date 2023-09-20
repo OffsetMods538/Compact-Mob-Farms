@@ -51,14 +51,14 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         sword.onOpen(player);
 
 
-        this.addSlot(new Slot(sampleTaker, 0, 32, 16) {
+        this.addSlot(new Slot(sampleTaker, 0, 35, 16) {
             @Override
             public boolean canInsert(ItemStack stack) {
                 return context.get((world, pos) -> SampleTakerItem.getSamplesCollected(stack).size() >= 10, false);
             }
         });
 
-        this.addSlot(new Slot(sword, 0, 71, 16));
+        this.addSlot(new Slot(sword, 0, 89, 16));
 
 
         // The player inventory
