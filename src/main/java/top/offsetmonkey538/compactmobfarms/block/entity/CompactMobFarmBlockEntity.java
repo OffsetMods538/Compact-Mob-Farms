@@ -177,7 +177,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     private float getAttackDamage(ItemStack sword, PlayerEntity player, LivingEntity target) {
         float result = (float) player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);
 
-        if (sword == null) return result;
+        if (sword == null || target == null) return result;
 
         return result + EnchantmentHelper.getAttackDamage(sword, target.getGroup());
     }
