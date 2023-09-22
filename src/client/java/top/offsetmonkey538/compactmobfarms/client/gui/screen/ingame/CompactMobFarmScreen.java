@@ -20,7 +20,7 @@ import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 import static top.offsetmonkey538.compactmobfarms.CompactMobFarms.*;
 
 public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHandler> {
-    private static final Quaternionf ENTITY_ROTATION = new Quaternionf().rotationXYZ(0, 0, (float) Math.PI);
+    private static final Quaternionf ENTITY_ROTATION = new Quaternionf().rotationZ((float) Math.PI);
     private static final Vector3f FRONT_UP_LIGHT = new Vector3f(0, -1, 0.5f).normalize();
     private static final Identifier TEXTURE = id("textures/gui/container/compact_mob_farm.png");
     private LivingEntity entity;
@@ -34,7 +34,6 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
         super.init();
         setEntity(handler.getEntityType());
 
-        // TODO: use translations for this
         addDrawableChild(
                 CyclingButtonWidget
                         .onOffBuilder(Text.of("On"), Text.of("Off"))
@@ -51,10 +50,6 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        //RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        //RenderSystem.setShaderColor(1, 1, 1, 1);
-        //RenderSystem.setShaderTexture(0, TEXTURE);
-
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
 
@@ -67,15 +62,6 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
         int entityY = y + 63;
 
         renderEntity(context, entity, entityX, entityY, 42, ENTITY_ROTATION);
-    }
-
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context);
-
-        super.render(context, mouseX, mouseY, delta);
-
-        drawMouseoverTooltip(context, mouseX, mouseY);
     }
 
     public static void renderEntity(DrawContext context, LivingEntity entity, int x, int y, int boxSize, Quaternionf rotation) {
@@ -95,6 +81,15 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
         context.draw();
         context.getMatrices().pop();
         DiffuseLighting.enableGuiDepthLighting();
+    }
+
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderBackground(context);
+
+        super.render(context, mouseX, mouseY, delta);
+
+        drawMouseoverTooltip(context, mouseX, mouseY);
     }
 
     public void setEntity(EntityType<?> entityType) {
