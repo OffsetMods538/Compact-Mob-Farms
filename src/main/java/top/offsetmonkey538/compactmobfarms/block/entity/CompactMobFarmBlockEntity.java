@@ -12,7 +12,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -120,7 +122,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
             if (this.getSword().damage(1, world.random, null)) this.sword.clear();
         }
 
-        float attackDamage = getAttackDamage(this.getSword(), player, currentEntity);
+        float attackDamage = getAttackDamage(this.getSword(), currentEntity);
 
 
         currentEntityHealth -= attackDamage;
@@ -174,12 +176,17 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         this.packetSenders.remove(sender);
     }
 
-    private float getAttackDamage(ItemStack sword, PlayerEntity player, LivingEntity target) {
-        float result = (float) player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);
+    private float getAttackDamage(@Nullable ItemStack sword, LivingEntity target) {
+        float result = 1;
 
-        if (sword == null || target == null) return result;
 
-        return result + EnchantmentHelper.getAttackDamage(sword, target.getGroup());
+        if (sword != null && target != null) {
+            result += EnchantmentHelper.getAttackDamage(sword, target.getGroup());
+            result += sword.getAttributeModifiers(EquipmentSlot.MAINHAND).get(EntityAttributes.GENERIC_ATTACK_DAMAGE).stream()
+                    .mapToDouble(EntityAttributeModifier::getValue).sum();
+        }
+
+        return result;
     }
 
     private void killEntity(PlayerEntity player) {
