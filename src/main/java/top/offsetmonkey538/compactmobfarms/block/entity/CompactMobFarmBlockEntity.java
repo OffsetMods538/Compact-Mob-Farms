@@ -49,7 +49,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     private int killTimer = 0;
     private boolean isTurnedOn = true;
     private float maxEntityHealth = -1;
-    private float currentEntityHealth = 0;
+    private float currentEntityHealth = -1;
     private LivingEntity currentEntity = null;
     private final List<BiConsumer<Identifier, PacketByteBuf>> packetSenders = new ArrayList<>();
     final List<ItemStack> dropInventory = new ArrayList<>(1);
@@ -68,6 +68,10 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         public void markDirty() {
             super.markDirty();
             CompactMobFarmBlockEntity.this.markDirty();
+
+            CompactMobFarmBlockEntity.this.currentEntity = null;
+
+            CompactMobFarmBlockEntity.this.resetHealth();
         }
     };
     private final SimpleInventory sword = new SimpleInventory(1) {
@@ -112,7 +116,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     private void checkHealthAndKillEntity() {
         if (!(world instanceof ServerWorld serverWorld)) return;
 
-        if (maxEntityHealth == -1) maxEntityHealth = currentEntity.getMaxHealth();
+        if (maxEntityHealth == -1) setMaxEntityHealth(currentEntity.getMaxHealth());
         if (currentEntityHealth == -1) currentEntityHealth = maxEntityHealth;
 
         final FakePlayer player = FakePlayer.get(serverWorld);
@@ -125,12 +129,12 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         float attackDamage = getAttackDamage(this.getSword(), currentEntity);
 
 
-        currentEntityHealth -= attackDamage;
+        setCurrentEntityHealth(currentEntityHealth - attackDamage);
         if (currentEntityHealth > 0) return;
 
         killEntity(player);
 
-        currentEntityHealth = maxEntityHealth;
+        setCurrentEntityHealth(maxEntityHealth);
     }
 
     private boolean setCurrentEntity() {
@@ -138,7 +142,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         if (sampleTaker == null) return false;
 
         final EntityType<?> livingEntityType = SampleTakerItem.getSampledEntityType(sampleTaker);
-        sendUpdatePacket(livingEntityType);
+        sendEntityUpdatePacket(livingEntityType);
         if (livingEntityType == null) return false;
 
         final Entity entity = livingEntityType.create(this.getWorld());
@@ -148,7 +152,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         return true;
     }
 
-    private void sendUpdatePacket(EntityType<?> newEntity) {
+    private void sendEntityUpdatePacket(EntityType<?> newEntity) {
         if (newEntity == null) {
             sendPacket(ModPackets.GUI_ENTITY_REMOVED, PacketByteBufs.create());
             return;
@@ -210,6 +214,8 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         buf.writeBoolean(isTurnedOn);
+        buf.writeFloat(currentEntityHealth);
+        buf.writeFloat(maxEntityHealth);
         buf.writeBoolean(currentEntity != null);
         if (currentEntity != null) buf.writeRegistryValue(Registries.ENTITY_TYPE, currentEntity.getType());
     }
@@ -256,12 +262,11 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     @Override
     public void markDirty() {
         super.markDirty();
-        if (this.world == null) return;
-
-        world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_LISTENERS);
-        currentEntity = null;
-        maxEntityHealth = -1;
-        currentEntityHealth = -1;
+        // TODO:
+        //  I honestly don't remember what this is for:
+        //  if (this.world == null) return;
+        //  \
+        //  world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_LISTENERS);
     }
 
     public ItemStack getSampleTaker() {
@@ -274,5 +279,34 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
     public void setTurnedOn(boolean turnedOn) {
         this.isTurnedOn = turnedOn;
+    }
+
+    public void resetHealth() {
+        this.maxEntityHealth = -1;
+        this.currentEntityHealth = -1;
+
+        sendPacket(ModPackets.GUI_HEALTH_RESET, PacketByteBufs.create());
+    }
+
+    public void setMaxEntityHealth(float maxEntityHealth) {
+        this.maxEntityHealth = maxEntityHealth;
+
+
+        final PacketByteBuf buf = PacketByteBufs.create();
+
+        buf.writeFloat(maxEntityHealth);
+
+        sendPacket(ModPackets.GUI_MAX_HEALTH_CHANGED, buf);
+    }
+
+    public void setCurrentEntityHealth(float currentEntityHealth) {
+        this.currentEntityHealth = currentEntityHealth;
+
+
+        final PacketByteBuf buf = PacketByteBufs.create();
+
+        buf.writeFloat(currentEntityHealth);
+
+        sendPacket(ModPackets.GUI_HEALTH_CHANGED, buf);
     }
 }

@@ -29,6 +29,8 @@ public class CompactMobFarmsClient implements ClientModInitializer {
 		BlockEntityRendererFactories.register(ModBlockEntityTypes.COMPACT_MOB_FARM, CompactMobFarmBlockEntityRenderer::new);
 		HandledScreens.register(ModScreenHandlers.COMPACT_MOB_FARM_SCREEN_HANDLER, CompactMobFarmScreen::new);
 
+
+
 		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_ENTITY_CHANGED, (client, handler, buf, responseSender) -> {
 			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
 
@@ -44,6 +46,34 @@ public class CompactMobFarmsClient implements ClientModInitializer {
 			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
 
 			screen.clearEntity();
+		});
+
+
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_HEALTH_RESET, (client, handler, buf, responseSender) -> {
+			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
+			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
+
+			screen.resetEntityHealth();
+		});
+
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_HEALTH_CHANGED, (client, handler, buf, responseSender) -> {
+			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
+
+			float newHealth = buf.readFloat();
+
+			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
+
+			screen.setEntityHealth(newHealth);
+		});
+
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_MAX_HEALTH_CHANGED, (client, handler, buf, responseSender) -> {
+			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
+
+			float newMaxHealth = buf.readFloat();
+
+			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
+
+			screen.setMaxEntityHealth(newMaxHealth);
 		});
 	}
 }

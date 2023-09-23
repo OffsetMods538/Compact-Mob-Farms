@@ -24,6 +24,10 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
     private static final Vector3f FRONT_UP_LIGHT = new Vector3f(0, -1, 0.5f).normalize();
     private static final Identifier TEXTURE = id("textures/gui/container/compact_mob_farm.png");
     private LivingEntity entity;
+    private float maxEntityHealth = -1;
+    private float currentEntityHealth = -1;
+    private Text healthText = Text.empty();
+    private int healthX;
 
     public CompactMobFarmScreen(CompactMobFarmScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -33,6 +37,8 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
     protected void init() {
         super.init();
         setEntity(handler.getEntityType());
+        setEntityHealth(handler.getEntityHealth());
+        setMaxEntityHealth(handler.getMaxEntityHealth());
 
         addDrawableChild(
                 CyclingButtonWidget
@@ -46,6 +52,13 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
         );
 
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
+    }
+
+    @Override
+    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
+        super.drawForeground(context, mouseX, mouseY);
+
+        context.drawText(this.textRenderer, healthText, healthX, 70, 0xF82423, false);
     }
 
     @Override
@@ -109,5 +122,26 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
 
     public void clearEntity() {
         this.entity = null;
+    }
+
+    public void resetEntityHealth() {
+        this.maxEntityHealth = -1;
+        this.currentEntityHealth = -1;
+
+        healthText = Text.empty();
+    }
+
+    public void setEntityHealth(float newHealth) {
+        this.currentEntityHealth = newHealth;
+
+        healthText = Text.of(newHealth + " / " + maxEntityHealth);
+        healthX = 115 + (50 - textRenderer.getWidth(healthText)) / 2;
+    }
+
+    public void setMaxEntityHealth(float newMaxHealth) {
+        this.maxEntityHealth = newMaxHealth;
+
+        healthText = Text.of(currentEntityHealth + " / " + newMaxHealth);
+        healthX = 115 + (50 - textRenderer.getWidth(healthText)) / 2;
     }
 }
