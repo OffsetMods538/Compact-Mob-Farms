@@ -3,6 +3,7 @@ package top.offsetmonkey538.compactmobfarms.item;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Rarity;
@@ -15,10 +16,11 @@ public final class ModItems {
 
     }
 
-    public static final BlockItem       COMPACT_MOB_FARM = register(new BlockItem(ModBlocks.COMPACT_MOB_FARM, new FabricItemSettings().rarity(Rarity.UNCOMMON)), "compact_mob_farm");
-    public static final SampleTakerItem SAMPLE_TAKER     = register(new SampleTakerItem(new FabricItemSettings().maxCount(1)), "sample_taker");
+    public static final BlockItem       COMPACT_MOB_FARM = register("compact_mob_farm", new BlockItem(ModBlocks.COMPACT_MOB_FARM, new FabricItemSettings().rarity(Rarity.UNCOMMON)));
+    public static final SampleTakerItem SAMPLE_TAKER     = register("sample_taker",     new SampleTakerItem(new FabricItemSettings().maxCount(1)));
+    public static final Item            SPIRIT_BOTTLE    = register("spirit_bottle",    new Item(new FabricItemSettings().maxCount(16).rarity(Rarity.COMMON).recipeRemainder(Items.GLASS_BOTTLE)));
 
-    private static <T extends Item> T register(T item, String name) {
+    private static <T extends Item> T register(String name, T item) {
         return Registry.register(Registries.ITEM, id(name), item);
     }
 

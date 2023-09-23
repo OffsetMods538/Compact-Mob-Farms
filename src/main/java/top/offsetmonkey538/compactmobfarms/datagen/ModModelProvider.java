@@ -30,6 +30,8 @@ public class ModModelProvider extends FabricModelProvider {
 
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
+        itemModelGenerator.register(ModItems.SPIRIT_BOTTLE, Models.GENERATED);
+
         itemModelGenerator.writer.accept(ModelIds.getItemModelId(ModItems.COMPACT_MOB_FARM), new SimpleModelSupplier(ModelIds.getBlockModelId(ModBlocks.COMPACT_MOB_FARM)));
         Models.GENERATED.upload(ModelIds.getItemModelId(ModItems.SAMPLE_TAKER), TextureMap.layer0(ModItems.SAMPLE_TAKER), itemModelGenerator.writer, this::sampleTakerJsonGenerator);
         for (int i = 1; i <= 10; i++) {

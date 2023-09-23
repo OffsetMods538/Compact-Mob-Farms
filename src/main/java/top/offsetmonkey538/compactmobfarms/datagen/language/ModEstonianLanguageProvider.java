@@ -11,6 +11,8 @@ public class ModEstonianLanguageProvider extends FabricLanguageProvider {
 
     @Override
     public void generateTranslations(TranslationBuilder translationBuilder) {
+        translationBuilder.add(ModItems.SPIRIT_BOTTLE, "Pudel hingi");
+
         translationBuilder.add(ModItems.SAMPLE_TAKER, "Proovivõtja");
         translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".filled", "Täidetud proovivõtja");
 
