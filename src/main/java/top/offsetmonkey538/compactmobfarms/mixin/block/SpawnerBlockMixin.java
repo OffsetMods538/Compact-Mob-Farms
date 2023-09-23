@@ -13,25 +13,23 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 
 @Mixin(SpawnerBlock.class)
-public abstract class SpawnerBlockMixin extends Block {
-    public SpawnerBlockMixin(Settings settings) {
-        super(settings);
-    }
-
-
+public abstract class SpawnerBlockMixin extends AbstractBlockMixin {
     @Override
-    @SuppressWarnings("deprecation")
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected void compact_mob_farms$obtainSpiritBottleFromSpawner(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
         final ItemStack item = player.getStackInHand(hand);
 
-        if (!item.isOf(Items.GLASS_BOTTLE)) return ActionResult.PASS;
+        if (!item.isOf(Items.GLASS_BOTTLE)) {
+            cir.setReturnValue(ActionResult.PASS);
+            return;
+        }
 
         if (!player.getAbilities().creativeMode) item.decrement(1);
         player.giveItemStack(ModItems.SPIRIT_BOTTLE.getDefaultStack());
 
-        return ActionResult.success(world.isClient());
+        cir.setReturnValue(ActionResult.success(world.isClient()));
     }
 }
