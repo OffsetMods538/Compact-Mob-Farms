@@ -6,7 +6,6 @@ import java.util.function.BiConsumer;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -42,10 +41,13 @@ import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.accessor.EntityAccessor;
 import top.offsetmonkey538.compactmobfarms.inventory.CompactMobFarmInventory;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
+import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 
 public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMobFarmInventory, ExtendedScreenHandlerFactory {
+    public int killSpeedTicks = 40;
+
     private int killTimer = 0;
     private boolean isTurnedOn = true;
     private float maxEntityHealth = -1;
@@ -53,6 +55,23 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     private LivingEntity currentEntity = null;
     private final List<BiConsumer<Identifier, PacketByteBuf>> packetSenders = new ArrayList<>();
     final List<ItemStack> dropInventory = new ArrayList<>(1);
+    private final SimpleInventory upgrades = new SimpleInventory(4) {
+        @Override
+        public int getMaxCountPerStack() {
+            return 1;
+        }
+
+        @Override
+        public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
+            return false;
+        }
+
+        @Override
+        public void markDirty() {
+            super.markDirty();
+            CompactMobFarmBlockEntity.this.markDirty();
+        }
+    };
     private final SimpleInventory sampleTaker = new SimpleInventory(1) {
         @Override
         public int getMaxCountPerStack() {
@@ -106,7 +125,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
 
         blockEntity.killTimer++;
-        if (blockEntity.killTimer < 10) return;
+        if (blockEntity.killTimer < blockEntity.killSpeedTicks) return;
 
         blockEntity.checkHealthAndKillEntity();
 
@@ -190,6 +209,12 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
                     .mapToDouble(EntityAttributeModifier::getValue).sum();
         }
 
+        for (ItemStack upgradeStack : upgrades.stacks) {
+            if (!(upgradeStack.getItem() instanceof CompactMobFarmUpgradeItem upgrade)) continue;
+
+            result = upgrade.modifyAttackDamage(result, sword, target);
+        }
+
         return result;
     }
 
@@ -203,7 +228,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new CompactMobFarmScreenHandler(syncId, playerInventory, sampleTaker, sword, ScreenHandlerContext.create(this.world, this.pos));
+        return new CompactMobFarmScreenHandler(syncId, playerInventory, sampleTaker, upgrades, sword, ScreenHandlerContext.create(this.world, this.pos));
     }
 
     @Override
@@ -226,6 +251,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         this.dropInventory.forEach(item -> dropInventoryNbt.add(item.writeNbt(new NbtCompound())));
         nbt.put("DropInventory", dropInventoryNbt);
         nbt.put("SampleTaker", sampleTaker.toNbtList());
+        nbt.put("Upgrades", upgrades.toNbtList());
         nbt.put("Sword", sword.toNbtList());
         nbt.putBoolean("TurnedOn", isTurnedOn);
 
@@ -239,6 +265,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         nbt.getList("DropInventory", NbtElement.COMPOUND_TYPE)
                 .forEach(itemNbt -> this.dropInventory.add(ItemStack.fromNbt((NbtCompound) itemNbt)));
         sampleTaker.readNbtList(nbt.getList("SampleTaker", NbtElement.COMPOUND_TYPE));
+        upgrades.readNbtList(nbt.getList("Upgrades", NbtElement.COMPOUND_TYPE));
         sword.readNbtList(nbt.getList("Sword", NbtElement.COMPOUND_TYPE));
         isTurnedOn = nbt.getBoolean("TurnedOn");
     }

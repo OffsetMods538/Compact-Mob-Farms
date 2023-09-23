@@ -28,7 +28,7 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
     private BiConsumer<Identifier, PacketByteBuf> sender = null;
 
     public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
-        this(syncId, playerInventory, new SimpleInventory(1), new SimpleInventory(1), ScreenHandlerContext.EMPTY);
+        this(syncId, playerInventory, new SimpleInventory(1), new SimpleInventory(4), new SimpleInventory(1), ScreenHandlerContext.EMPTY);
 
         turnedOn = buf.readBoolean();
         entityHealth = buf.readFloat();
@@ -36,7 +36,7 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         if (buf.readBoolean()) this.entityType = buf.readRegistryValue(Registries.ENTITY_TYPE);
     }
 
-    public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, Inventory sampleTaker, Inventory sword, ScreenHandlerContext context) {
+    public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, Inventory sampleTaker, Inventory upgrades, Inventory sword, ScreenHandlerContext context) {
         super(ModScreenHandlers.COMPACT_MOB_FARM_SCREEN_HANDLER, syncId);
 
         PlayerEntity player = playerInventory.player;
@@ -53,6 +53,7 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         });
         sampleTaker.onOpen(player);
         sword.onOpen(player);
+        upgrades.onOpen(player);
 
 
         this.addSlot(new Slot(sampleTaker, 0, 35, 16) {
@@ -63,6 +64,12 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         });
 
         this.addSlot(new Slot(sword, 0, 89, 16));
+        // TODO: for tier upgrade: this.addSlot(new Slot(tierUpgrade, 0, 12, 53));
+
+        // The 4 upgrade slots
+        for (int i = 0; i < 4; i++) {
+            this.addSlot(new Slot(upgrades, i, 35 + (i * 18), 53));
+        }
 
 
         // The player inventory
