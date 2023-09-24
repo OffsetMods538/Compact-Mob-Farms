@@ -14,6 +14,7 @@ public class CompactMobFarmsDatagen implements DataGeneratorEntrypoint {
         pack.addProvider(ModBlockLootTableProvider::new);
         pack.addProvider(ModBlockTagProvider::new);
         pack.addProvider(ModModelProvider::new);
+        pack.addProvider(ModRecipeProvider::new);
 
         pack.addProvider(ModEnglishLanguageProvider::new);
         pack.addProvider(ModEstonianLanguageProvider::new);

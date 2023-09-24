@@ -12,6 +12,7 @@ public class ModEnglishLanguageProvider extends FabricLanguageProvider {
     @Override
     public void generateTranslations(TranslationBuilder translationBuilder) {
         translationBuilder.add(ModItems.SPIRIT_BOTTLE, "Bottle of Spirits");
+        translationBuilder.add(ModItems.SPAWNER_SHARD, "Spawner Shard");
 
         translationBuilder.add(ModItems.SAMPLE_TAKER, "Sample taker");
         translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".filled", "Filled sample taker");

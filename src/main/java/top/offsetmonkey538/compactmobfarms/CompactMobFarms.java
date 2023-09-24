@@ -1,6 +1,14 @@
 package top.offsetmonkey538.compactmobfarms;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
+import net.minecraft.block.Blocks;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.function.ApplyBonusLootFunction;
+import net.minecraft.loot.function.SetCountLootFunction;
+import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +28,17 @@ public class CompactMobFarms implements ModInitializer {
 		ModItems.register();
 		ModBlockEntityTypes.register();
 		ModScreenHandlers.register();
+
+		LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
+			if (!Blocks.SPAWNER.getLootTableId().equals(id) || !source.isBuiltin()) return;
+
+			LootPool.Builder pool = LootPool.builder()
+					.with(ItemEntry.builder(ModItems.SPAWNER_SHARD))
+					.apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(6, 8)))
+					.apply(ApplyBonusLootFunction.uniformBonusCount(Enchantments.FORTUNE, 5));
+
+			tableBuilder.pool(pool);
+		});
 	}
 
 	public static Identifier id(String path) {
