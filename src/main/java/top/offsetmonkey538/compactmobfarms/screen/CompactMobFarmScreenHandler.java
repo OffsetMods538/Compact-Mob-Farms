@@ -18,6 +18,7 @@ import net.minecraft.util.Identifier;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
+import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
 
 public class CompactMobFarmScreenHandler extends ScreenHandler {
     private EntityType<?> entityType;
@@ -68,7 +69,12 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
 
         // The 4 upgrade slots
         for (int i = 0; i < 4; i++) {
-            this.addSlot(new Slot(upgrades, i, 35 + (i * 18), 53));
+            this.addSlot(new Slot(upgrades, i, 35 + (i * 18), 53) {
+                @Override
+                public boolean canInsert(ItemStack stack) {
+                    return stack.getItem() instanceof CompactMobFarmUpgradeItem;
+                }
+            });
         }
 
 
