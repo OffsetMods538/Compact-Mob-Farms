@@ -46,7 +46,7 @@ import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 
 public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMobFarmInventory, ExtendedScreenHandlerFactory {
-    public int killSpeedTicks = 40;
+    public static final int DEFAULT_ATTACK_SPEED = 30 * 20; // 30 seconds, multiplied by 20 because it needs to be in ticks.
 
     private int killTimer = 0;
     private boolean isTurnedOn = true;
@@ -124,12 +124,12 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         if (!blockEntity.isTurnedOn) return;
 
 
-        blockEntity.killTimer++;
-        if (blockEntity.killTimer < blockEntity.killSpeedTicks) return;
+        blockEntity.killTimer--;
+        if (blockEntity.killTimer > 0) return;
 
         blockEntity.checkHealthAndKillEntity();
 
-        blockEntity.killTimer = 0;
+        blockEntity.killTimer = blockEntity.getAttackSpeed(blockEntity.getSword(), blockEntity.currentEntity);
     }
 
     private void checkHealthAndKillEntity() {
@@ -199,6 +199,18 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         this.packetSenders.remove(sender);
     }
 
+    private int getAttackSpeed(@Nullable ItemStack sword, LivingEntity target) {
+        int result = DEFAULT_ATTACK_SPEED;
+
+        for (ItemStack upgradeStack : upgrades.stacks) {
+            if (!(upgradeStack.getItem() instanceof CompactMobFarmUpgradeItem upgrade)) continue;
+
+            result += upgrade.modifyAttackSpeed(result, sword, target, this);
+        }
+
+        return result;
+    }
+
     private float getAttackDamage(@Nullable ItemStack sword, LivingEntity target) {
         float result = 1;
 
@@ -212,7 +224,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         for (ItemStack upgradeStack : upgrades.stacks) {
             if (!(upgradeStack.getItem() instanceof CompactMobFarmUpgradeItem upgrade)) continue;
 
-            result = upgrade.modifyAttackDamage(result, sword, target);
+            result = upgrade.modifyAttackDamage(result, sword, target, this);
         }
 
         return result;
