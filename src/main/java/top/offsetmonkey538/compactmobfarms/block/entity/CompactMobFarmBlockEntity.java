@@ -233,6 +233,10 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     private void killEntity(PlayerEntity player) {
         ((EntityAccessor) currentEntity).compact_mob_farms$setDropMethod(this::addStack);
 
+        currentEntity.age = 1;
+        currentEntity.setAttacker(player);
+        currentEntity.setAttacking(player);
+
         currentEntity.drop(currentEntity.getDamageSources().playerAttack(player));
     }
 
