@@ -62,10 +62,12 @@ public interface CompactMobFarmInventory extends Inventory {
 
             storedStack.setCount(newCount);
             getItems().set(i, storedStack);
+            markDirty();
             return;
         }
 
         getItems().add(stack);
+        markDirty();
     }
 
     @Override
@@ -86,9 +88,6 @@ public interface CompactMobFarmInventory extends Inventory {
     }
 
     @Override
-    void markDirty();
-
-    @Override
     default boolean canPlayerUse(PlayerEntity player) {
         return true;
     }
@@ -96,5 +95,6 @@ public interface CompactMobFarmInventory extends Inventory {
     @Override
     default void clear() {
         getItems().clear();
+        markDirty();
     }
 }
