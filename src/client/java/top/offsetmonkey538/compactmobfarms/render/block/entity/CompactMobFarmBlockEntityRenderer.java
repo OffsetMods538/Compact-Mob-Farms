@@ -11,7 +11,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
-import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
+import top.offsetmonkey538.compactmobfarms.item.FilledSampleTakerItem;
 
 public class CompactMobFarmBlockEntityRenderer implements BlockEntityRenderer<CompactMobFarmBlockEntity> {
     public CompactMobFarmBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
@@ -24,7 +24,7 @@ public class CompactMobFarmBlockEntityRenderer implements BlockEntityRenderer<Co
         final ItemStack sampleTaker = blockEntity.getSampleTaker();
         if (sampleTaker == null) return;
 
-        final EntityType<?> entityType = SampleTakerItem.getSampledEntityType(sampleTaker);
+        final EntityType<?> entityType = FilledSampleTakerItem.getSampledEntityType(sampleTaker);
         if (entityType == null) return;
 
         final Entity entity = entityType.create(blockEntity.getWorld());

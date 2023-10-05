@@ -2,6 +2,7 @@ package top.offsetmonkey538.compactmobfarms.item.group;
 
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.SpawnEggItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
@@ -24,6 +25,13 @@ public final class ModItemGroups {
                         entries.add(ModItems.COMPACT_MOB_FARM);
                         entries.add(ModItems.SAMPLE_TAKER);
                     })
+                    .build()
+    );
+    public static final ItemGroup FILLED_SAMPLE_TAKERS_ITEM_GROUP = register("filled_sample_takers_item_group",
+            FabricItemGroup.builder()
+                    .icon(ModItems.FILLED_SAMPLE_TAKER::getDefaultStack)
+                    .displayName(Text.translatable("itemGroup.compact_mob_farms.filled_sample_takers_group"))
+                    .entries((displayContext, entries) -> SpawnEggItem.getAll().forEach(spawnEgg -> entries.add(ModItems.FILLED_SAMPLE_TAKER.forEntity(spawnEgg.getEntityType(null)))))
                     .build()
     );
 

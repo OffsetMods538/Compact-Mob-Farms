@@ -44,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.accessor.EntityAccessor;
 import top.offsetmonkey538.compactmobfarms.accessor.LivingEntityAccessor;
 import top.offsetmonkey538.compactmobfarms.inventory.CompactMobFarmInventory;
-import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
+import top.offsetmonkey538.compactmobfarms.item.FilledSampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
@@ -165,7 +165,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         final ItemStack sampleTaker = this.getSampleTaker();
         if (sampleTaker == null) return false;
 
-        final EntityType<?> livingEntityType = SampleTakerItem.getSampledEntityType(sampleTaker);
+        final EntityType<?> livingEntityType = FilledSampleTakerItem.getSampledEntityType(sampleTaker);
         sendEntityUpdatePacket(livingEntityType);
         if (livingEntityType == null) return false;
 

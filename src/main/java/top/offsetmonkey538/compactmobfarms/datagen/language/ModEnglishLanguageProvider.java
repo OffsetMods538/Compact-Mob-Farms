@@ -12,13 +12,14 @@ public class ModEnglishLanguageProvider extends FabricLanguageProvider {
     @Override
     public void generateTranslations(TranslationBuilder translationBuilder) {
         translationBuilder.add("itemGroup.compact_mob_farms.main_group", "Compact Mob Farms");
+        translationBuilder.add("itemGroup.compact_mob_farms.filled_sample_takers_group", "Sample Takers");
 
         translationBuilder.add(ModItems.SPIRIT_BOTTLE, "Bottle of Spirits");
         translationBuilder.add(ModItems.SPAWNER_SHARD, "Spawner Shard");
         translationBuilder.add(ModItems.COMPACT_MOB_FARM, "Compact Mob Farm");
 
-        translationBuilder.add(ModItems.SAMPLE_TAKER, "Sample taker");
-        translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".filled", "Filled sample taker");
+        translationBuilder.add(ModItems.SAMPLE_TAKER, "Sample Taker");
+        translationBuilder.add(ModItems.FILLED_SAMPLE_TAKER, "Filled Sample Taker");
 
         translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.amount", "Samples taken: %s");
         translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.type", "Sample type: %s");

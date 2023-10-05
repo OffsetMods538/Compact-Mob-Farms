@@ -17,7 +17,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
-import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
+import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
 
 public class CompactMobFarmScreenHandler extends ScreenHandler {
@@ -60,7 +60,7 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         this.addSlot(new Slot(sampleTaker, 0, 35, 16) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return context.get((world, pos) -> SampleTakerItem.getSamplesCollected(stack).size() >= 10, false);
+                return context.get((world, pos) -> stack.isOf(ModItems.FILLED_SAMPLE_TAKER), false);
             }
         });
 

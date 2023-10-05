@@ -36,7 +36,7 @@ public class SampleTakerItem extends Item {
         final List<UUID> samplesCollected = getSamplesCollected(stack);
         final UUID targetUuid = targetEntity.getUuid();
 
-        if (samplesCollected.size() >= 10 || samplesCollected.contains(targetUuid) || (sampledEntiyIdentifier != null && !sampledEntiyIdentifier.equals(targetEntityIdentifier))) return super.useOnEntity(stack, user, targetEntity, hand);
+        if (samplesCollected.contains(targetUuid) || (sampledEntiyIdentifier != null && !sampledEntiyIdentifier.equals(targetEntityIdentifier))) return super.useOnEntity(stack, user, targetEntity, hand);
 
 
         if (user.getWorld().isClient()) return ActionResult.SUCCESS;
@@ -44,6 +44,11 @@ public class SampleTakerItem extends Item {
         if (sampledEntiyIdentifier == null) setSampledEntity(stack, targetEntityIdentifier);
         samplesCollected.add(targetUuid);
         setSamplesCollected(stack, samplesCollected);
+
+        if (samplesCollected.size() >= 10) {
+            user.setStackInHand(hand, ModItems.FILLED_SAMPLE_TAKER.forEntity(sampledEntiyIdentifier));
+            return ActionResult.CONSUME;
+        }
 
         if (user.getAbilities().creativeMode) user.setStackInHand(hand, stack);
 
@@ -77,12 +82,6 @@ public class SampleTakerItem extends Item {
         tooltip.add(Text.translatable(getTranslationKey() + ".tooltip.type", sampledEntity.getName()));
     }
 
-    @Override
-    public String getTranslationKey(ItemStack stack) {
-        if (getSamplesCollected(stack).size() >= 10) return super.getTranslationKey(stack) + ".filled";
-        return super.getTranslationKey(stack);
-    }
-
     public static void setSampledEntity(ItemStack stack, Identifier entity) {
         stack.getOrCreateNbt().putString(SAMPLED_ENTITY_KEY, entity.toString());
     }
@@ -95,11 +94,13 @@ public class SampleTakerItem extends Item {
         stack.getOrCreateNbt().put(SAMPLES_COLLECTED_KEY, nbtList);
     }
 
+    @Nullable
     public static Identifier getSampledEntityId(ItemStack stack) {
         if (stack.getNbt() == null || !stack.getNbt().contains(SAMPLED_ENTITY_KEY)) return null;
         return new Identifier(stack.getNbt().getString(SAMPLED_ENTITY_KEY));
     }
 
+    @Nullable
     public static EntityType<?> getSampledEntityType(ItemStack stack) {
         final Identifier id = getSampledEntityId(stack);
 

@@ -12,13 +12,14 @@ public class ModEstonianLanguageProvider extends FabricLanguageProvider {
     @Override
     public void generateTranslations(TranslationBuilder translationBuilder) {
         translationBuilder.add("itemGroup.compact_mob_farms.main_group", "Kompaktsed Olendi Farmid");
+        translationBuilder.add("itemGroup.compact_mob_farms.filled_sample_takers_group", "Proovivõtjad");
 
         translationBuilder.add(ModItems.SPIRIT_BOTTLE, "Pudel vaime");
         translationBuilder.add(ModItems.SPAWNER_SHARD, "Tekitaja kild");
         translationBuilder.add(ModItems.COMPACT_MOB_FARM, "Kompaktne Olendi Farm");
 
         translationBuilder.add(ModItems.SAMPLE_TAKER, "Proovivõtja");
-        translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".filled", "Täidetud proovivõtja");
+        translationBuilder.add(ModItems.FILLED_SAMPLE_TAKER, "Täidetud proovivõtja");
 
         translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.amount", "Proove võetud: %s");
         translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.type", "Proovi tüüp: %s");

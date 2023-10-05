@@ -32,10 +32,11 @@ public class ModModelProvider extends FabricModelProvider {
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
         itemModelGenerator.register(ModItems.SPIRIT_BOTTLE, Models.GENERATED);
         itemModelGenerator.register(ModItems.SPAWNER_SHARD, Models.GENERATED);
+        itemModelGenerator.register(ModItems.FILLED_SAMPLE_TAKER, Models.GENERATED);
 
         itemModelGenerator.writer.accept(ModelIds.getItemModelId(ModItems.COMPACT_MOB_FARM), new SimpleModelSupplier(ModelIds.getBlockModelId(ModBlocks.COMPACT_MOB_FARM)));
         Models.GENERATED.upload(ModelIds.getItemModelId(ModItems.SAMPLE_TAKER), TextureMap.layer0(ModItems.SAMPLE_TAKER), itemModelGenerator.writer, this::sampleTakerJsonGenerator);
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 9; i++) {
             itemModelGenerator.register(ModItems.SAMPLE_TAKER, "_filled_" + i, Models.GENERATED);
         }
     }
@@ -44,7 +45,7 @@ public class ModModelProvider extends FabricModelProvider {
         JsonObject json = Models.GENERATED.createJson(id, textures);
 
         JsonArray overrides = new JsonArray();
-        for (int filled = 1; filled <= 10; filled++) {
+        for (int filled = 1; filled <= 9; filled++) {
             JsonObject override = new JsonObject();
             JsonObject predicate = new JsonObject();
 

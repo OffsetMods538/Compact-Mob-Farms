@@ -21,10 +21,11 @@ public final class ModItems {
 
     }
 
-    public static final BlockItem       COMPACT_MOB_FARM = register("compact_mob_farm", new BlockItem(ModBlocks.COMPACT_MOB_FARM, new FabricItemSettings().rarity(Rarity.UNCOMMON)));
-    public static final SampleTakerItem SAMPLE_TAKER     = register("sample_taker",     new SampleTakerItem(new FabricItemSettings().maxCount(1)));
-    public static final Item            SPIRIT_BOTTLE    = register("spirit_bottle",    new Item(new FabricItemSettings().maxCount(16).rarity(Rarity.COMMON).recipeRemainder(Items.GLASS_BOTTLE)));
-    public static final Item            SPAWNER_SHARD    = register("spawner_shard",    new Item(new FabricItemSettings().rarity(Rarity.UNCOMMON)));
+    public static final BlockItem             COMPACT_MOB_FARM    = register("compact_mob_farm",    new BlockItem(ModBlocks.COMPACT_MOB_FARM, new FabricItemSettings().rarity(Rarity.RARE)));
+    public static final SampleTakerItem       SAMPLE_TAKER        = register("sample_taker",        new SampleTakerItem(new FabricItemSettings().maxCount(1)));
+    public static final FilledSampleTakerItem FILLED_SAMPLE_TAKER = register("filled_sample_taker", new FilledSampleTakerItem(new FabricItemSettings().maxCount(1).rarity(Rarity.UNCOMMON)));
+    public static final Item                  SPIRIT_BOTTLE       = register("spirit_bottle",       new Item(new FabricItemSettings().maxCount(16).rarity(Rarity.UNCOMMON).recipeRemainder(Items.GLASS_BOTTLE)));
+    public static final Item                  SPAWNER_SHARD       = register("spawner_shard",       new Item(new FabricItemSettings().rarity(Rarity.UNCOMMON)));
 
     public static final CompactMobFarmUpgradeItem DEBUG_SPEED_UPGRADE  = register("debug_speed_upgrade",  new CompactMobFarmUpgradeItem() {
         @Override
