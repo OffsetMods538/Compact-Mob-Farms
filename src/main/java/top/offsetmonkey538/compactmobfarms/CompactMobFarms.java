@@ -2,6 +2,7 @@ package top.offsetmonkey538.compactmobfarms;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.loot.LootPool;
@@ -28,6 +29,9 @@ public class CompactMobFarms implements ModInitializer {
 		ModItems.register();
 		ModBlockEntityTypes.register();
 		ModScreenHandlers.register();
+
+		//noinspection UnstableApiUsage
+		ItemStorage.SIDED.registerForBlockEntity((block, direction) -> block.getDropInventory(), ModBlockEntityTypes.COMPACT_MOB_FARM);
 
 		LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
 			if (!Blocks.SPAWNER.getLootTableId().equals(id) || !source.isBuiltin()) return;

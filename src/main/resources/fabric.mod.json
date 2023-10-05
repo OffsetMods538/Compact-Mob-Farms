@@ -40,5 +40,8 @@
 	"depends": {
 		"fabric-api": "*",
 		"minecraft": "${supportedMinecraftVersions}"
+	},
+	"suggests": {
+		"create": ">=0.4"
 	}
 }

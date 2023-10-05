@@ -6,9 +6,12 @@ import java.util.function.BiConsumer;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -19,10 +22,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -39,14 +42,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.accessor.EntityAccessor;
+import top.offsetmonkey538.compactmobfarms.accessor.LivingEntityAccessor;
 import top.offsetmonkey538.compactmobfarms.inventory.CompactMobFarmInventory;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 
-public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMobFarmInventory, ExtendedScreenHandlerFactory {
+public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
     public static final int DEFAULT_ATTACK_SPEED = 30 * 20; // 30 seconds, multiplied by 20 because it needs to be in ticks.
+    public static final Item NUGGET_OF_EXPERIENCE = Registries.ITEM.get(new Identifier("create:experience_nugget"));
 
     private int killTimer = 0;
     private boolean isTurnedOn = true;
@@ -54,7 +59,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     private float currentEntityHealth = -1;
     private LivingEntity currentEntity = null;
     private final List<BiConsumer<Identifier, PacketByteBuf>> packetSenders = new ArrayList<>();
-    final List<ItemStack> dropInventory = new ArrayList<>(1);
+    final CompactMobFarmInventory dropInventory = new CompactMobFarmInventory();
     private final SimpleInventory upgrades = new SimpleInventory(4) {
         @Override
         public int getMaxCountPerStack() {
@@ -230,8 +235,15 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
         return result;
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private void killEntity(PlayerEntity player) {
-        ((EntityAccessor) currentEntity).compact_mob_farms$setDropMethod(this::addStack);
+        ((EntityAccessor) currentEntity).compact_mob_farms$setDropMethod(stack -> {
+            try (Transaction transaction = Transaction.openOuter()) {
+                dropInventory.insert(ItemVariant.of(stack), stack.getCount(), transaction);
+                transaction.commit();
+            }
+        });
+        ((LivingEntityAccessor) currentEntity).compact_mob_farms$setXpDropMethod(this::dropXp);
 
         currentEntity.age = 1;
         currentEntity.setAttacker(player);
@@ -263,9 +275,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        NbtList dropInventoryNbt = new NbtList();
-        this.dropInventory.forEach(item -> dropInventoryNbt.add(item.writeNbt(new NbtCompound())));
-        nbt.put("DropInventory", dropInventoryNbt);
+        nbt.put("DropInventory", dropInventory.toNbtList());
         nbt.put("SampleTaker", sampleTaker.toNbtList());
         nbt.put("Upgrades", upgrades.toNbtList());
         nbt.put("Sword", sword.toNbtList());
@@ -278,17 +288,11 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
 
-        nbt.getList("DropInventory", NbtElement.COMPOUND_TYPE)
-                .forEach(itemNbt -> this.dropInventory.add(ItemStack.fromNbt((NbtCompound) itemNbt)));
+        dropInventory.fromNbt(nbt.getList("DropInventory", NbtElement.COMPOUND_TYPE));
         sampleTaker.readNbtList(nbt.getList("SampleTaker", NbtElement.COMPOUND_TYPE));
         upgrades.readNbtList(nbt.getList("Upgrades", NbtElement.COMPOUND_TYPE));
         sword.readNbtList(nbt.getList("Sword", NbtElement.COMPOUND_TYPE));
         isTurnedOn = nbt.getBoolean("TurnedOn");
-    }
-
-    @Override
-    public List<ItemStack> getItems() {
-        return dropInventory;
     }
 
     @Nullable
@@ -300,6 +304,23 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
     @Override
     public NbtCompound toInitialChunkDataNbt() {
         return createNbt();
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private void dropXp(int amount) {
+        final ItemStack sword = getSword();
+
+        if (EnchantmentHelper.get(sword).containsKey(Enchantments.MENDING) && sword.isDamaged()) {
+            int repairAmount = Math.min(amount * 2, sword.getDamage());
+            sword.setDamage(sword.getDamage() - repairAmount);
+
+            amount -= repairAmount / 2;
+        }
+
+        try (Transaction transaction = Transaction.openOuter()) {
+            dropInventory.insert(ItemVariant.of(NUGGET_OF_EXPERIENCE), amount / 3, transaction);
+            transaction.commit();
+        }
     }
 
     @Override
@@ -318,6 +339,10 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements CompactMob
 
     public ItemStack getSword() {
         return sword.getStack(0);
+    }
+
+    public CompactMobFarmInventory getDropInventory() {
+        return dropInventory;
     }
 
     public void setTurnedOn(boolean turnedOn) {

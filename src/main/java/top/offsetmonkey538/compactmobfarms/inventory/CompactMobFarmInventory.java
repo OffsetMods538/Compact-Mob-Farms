@@ -1,100 +1,142 @@
 package top.offsetmonkey538.compactmobfarms.inventory;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 
-public interface CompactMobFarmInventory extends Inventory {
-
-    List<ItemStack> getItems();
+@SuppressWarnings("UnstableApiUsage")
+public class CompactMobFarmInventory implements SlottedStorage<ItemVariant> {
+    private final List<Slot> slots = new ArrayList<>();
 
     @Override
-    default int size() {
-        return getItems().size();
+    public int getSlotCount() {
+        return slots.size();
     }
 
     @Override
-    default boolean isEmpty() {
-        return getItems().isEmpty();
+    public SingleSlotStorage<ItemVariant> getSlot(int slot) {
+        return slots.get(slot);
     }
 
     @Override
-    default ItemStack getStack(int slot) {
-        if (slot >= size()) return ItemStack.EMPTY;
-        return getItems().get(slot);
-    }
-
-    @Override
-    default ItemStack removeStack(int slot, int amount) {
-        if (slot >= size()) return ItemStack.EMPTY;
-        ItemStack removedStack;
-
-        if (getStack(slot).getCount() - amount <= 0) {
-            removedStack = getItems().remove(slot);
-        } else {
-            removedStack = Inventories.splitStack(getItems(), slot, amount);
-        }
-
-        if (!removedStack.isEmpty()) {
-            this.markDirty();
-        }
-        return removedStack;
-    }
-
-    @Override
-    default ItemStack removeStack(int slot) {
-        this.markDirty();
-        return getItems().remove(slot);
-    }
-
-    default void addStack(ItemStack stack) {
-        if (stack.isEmpty()) return;
-
-        for (int i = 0; i < size(); i++) {
-            ItemStack storedStack = getStack(i);
-
-            if (!storedStack.isOf(stack.getItem()) || (stack.getNbt() != null && !stack.getNbt().equals(storedStack.getNbt()))) continue;
-
-            int newCount = stack.getCount() + storedStack.getCount();
-            if (newCount > getMaxCountPerStack()) newCount = getMaxCountPerStack();
-
-            storedStack.setCount(newCount);
-            getItems().set(i, storedStack);
-            markDirty();
-            return;
-        }
-
-        getItems().add(stack);
-        markDirty();
-    }
-
-    @Override
-    default void setStack(int slot, ItemStack stack) {
-        if (slot >= size()) return;
-        if (stack.isEmpty()) {
-            getItems().remove(slot);
-            return;
-        }
-        getItems().set(slot, stack);
-        this.markDirty();
-    }
-
-    @Override
-    default boolean isValid(int slot, ItemStack stack) {
-        // We don't want hoppers or anything to put items in here
+    public boolean supportsInsertion() {
         return false;
     }
 
     @Override
-    default boolean canPlayerUse(PlayerEntity player) {
-        return true;
+    public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+        if (resource.isBlank()) return 0;
+
+        for (Slot slot : slots) {
+            final ItemStack storedStack = slot.getStack();
+            if (!storedStack.isOf(resource.getItem()) || (resource.getNbt() != null && resource.getNbt().equals(storedStack.getNbt()))) continue;
+
+            int oldCount = storedStack.getCount();
+            int newCount = (int) Math.min(64, oldCount + maxAmount);
+
+            storedStack.setCount(newCount);
+            slot.setStack(storedStack);
+
+            return newCount - oldCount;
+        }
+
+
+        // None of the already stored stacks match the new stack.
+
+        int count = (int) Math.min(64, maxAmount);
+        final ItemStack addedStack = resource.toStack(count);
+
+        slots.add(new Slot(addedStack));
+
+        return count;
     }
 
     @Override
-    default void clear() {
-        getItems().clear();
-        markDirty();
+    public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+        if (resource.isBlank()) return 0;
+
+        for (Slot slot : slots) {
+            final ItemStack storedStack = slot.getStack();
+            if (!storedStack.isOf(resource.getItem()) || (resource.getNbt() != null && resource.getNbt().equals(storedStack.getNbt()))) continue;
+
+            int oldCount = storedStack.getCount();
+            int newCount = (int) Math.min(0, oldCount - maxAmount);
+
+            storedStack.setCount(newCount);
+            slot.setStack(storedStack);
+            if (newCount == 0) slots.remove(slot);
+
+            return oldCount - newCount;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public Iterator<StorageView<ItemVariant>> iterator() {
+        return new Iterator<>() {
+            int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return CompactMobFarmInventory.this.slots.size() > i;
+            }
+
+            @Override
+            public StorageView<ItemVariant> next() {
+                return CompactMobFarmInventory.this.slots.get(i++);
+            }
+        };
+    }
+
+    public NbtList toNbtList() {
+        final NbtList nbt = new NbtList();
+
+        slots.forEach((Slot slot) -> nbt.add(slot.toNbt()));
+
+        return nbt;
+    }
+
+    public void fromNbt(NbtList nbtList) {
+        nbtList.forEach(nbt -> slots.add(new Slot((NbtCompound) nbt)));
+    }
+
+    private class Slot extends SingleStackStorage {
+        private ItemStack stack;
+
+        public Slot(ItemStack stack) {
+            this.stack = stack;
+        }
+        public Slot(NbtCompound nbt) {
+            this(ItemStack.fromNbt(nbt));
+        }
+
+        @Override
+        protected ItemStack getStack() {
+            return stack;
+        }
+
+        @Override
+        protected void setStack(ItemStack stack) {
+            this.stack = stack;
+        }
+
+        @Override
+        protected void onFinalCommit() {
+            if (stack.isEmpty()) CompactMobFarmInventory.this.slots.remove(this);
+        }
+
+        public NbtCompound toNbt() {
+            return stack.writeNbt(new NbtCompound());
+        }
     }
 }
