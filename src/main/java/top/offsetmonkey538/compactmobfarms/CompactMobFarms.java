@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.ModBlockEntityTypes;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
+import top.offsetmonkey538.compactmobfarms.item.group.ModItemGroups;
 import top.offsetmonkey538.compactmobfarms.screen.ModScreenHandlers;
 
 public class CompactMobFarms implements ModInitializer {
@@ -27,6 +28,7 @@ public class CompactMobFarms implements ModInitializer {
 		// Do stuff
 		ModBlocks.register();
 		ModItems.register();
+		ModItemGroups.register();
 		ModBlockEntityTypes.register();
 		ModScreenHandlers.register();
 

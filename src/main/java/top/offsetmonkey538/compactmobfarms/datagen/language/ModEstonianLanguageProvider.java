@@ -11,6 +11,8 @@ public class ModEstonianLanguageProvider extends FabricLanguageProvider {
 
     @Override
     public void generateTranslations(TranslationBuilder translationBuilder) {
+        translationBuilder.add("itemGroup.compact_mob_farms.main_group", "Kompaktsed Olendi Farmid");
+
         translationBuilder.add(ModItems.SPIRIT_BOTTLE, "Pudel vaime");
         translationBuilder.add(ModItems.SPAWNER_SHARD, "Tekitaja kild");
         translationBuilder.add(ModItems.COMPACT_MOB_FARM, "Kompaktne Olendi Farm");

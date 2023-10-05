@@ -11,6 +11,8 @@ public class ModEnglishLanguageProvider extends FabricLanguageProvider {
 
     @Override
     public void generateTranslations(TranslationBuilder translationBuilder) {
+        translationBuilder.add("itemGroup.compact_mob_farms.main_group", "Compact Mob Farms");
+
         translationBuilder.add(ModItems.SPIRIT_BOTTLE, "Bottle of Spirits");
         translationBuilder.add(ModItems.SPAWNER_SHARD, "Spawner Shard");
         translationBuilder.add(ModItems.COMPACT_MOB_FARM, "Compact Mob Farm");
