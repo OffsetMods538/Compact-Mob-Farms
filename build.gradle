@@ -83,8 +83,6 @@ dependencies {
 
 	// Mixin Extras
 	includeImplementation annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-fabric:${project.mixinextras_version}")
-	// TODO: don't commit this, just for debugging
-	implementation files("/opt/idea/plugins/java-decompiler/lib/java-decompiler.jar")
 }
 
 processResources {
