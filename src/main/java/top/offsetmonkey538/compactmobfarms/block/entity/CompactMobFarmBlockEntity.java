@@ -210,7 +210,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         for (ItemStack upgradeStack : upgrades.stacks) {
             if (!(upgradeStack.getItem() instanceof CompactMobFarmUpgradeItem upgrade)) continue;
 
-            result += upgrade.modifyAttackSpeed(result, sword, target, this);
+            result = upgrade.modifyAttackSpeed(result, sword, target, this);
         }
 
         return result;
