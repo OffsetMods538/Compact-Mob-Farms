@@ -32,7 +32,14 @@ public class ModModelProvider extends FabricModelProvider {
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
         itemModelGenerator.register(ModItems.SPIRIT_BOTTLE, Models.GENERATED);
         itemModelGenerator.register(ModItems.SPAWNER_SHARD, Models.GENERATED);
-        itemModelGenerator.register(ModItems.FILLED_SAMPLE_TAKER, Models.GENERATED);
+        Models.GENERATED.upload(
+                ModelIds.getItemModelId(ModItems.FILLED_SAMPLE_TAKER),
+                TextureMap
+                        .layer0(ModItems.FILLED_SAMPLE_TAKER)
+                        .register(TextureKey.LAYER1, TextureMap.getSubId(ModItems.FILLED_SAMPLE_TAKER, "_layer_1"))
+                        .register(TextureKey.LAYER2, TextureMap.getSubId(ModItems.FILLED_SAMPLE_TAKER, "_overlay")),
+                itemModelGenerator.writer
+        );
 
         itemModelGenerator.writer.accept(ModelIds.getItemModelId(ModItems.COMPACT_MOB_FARM), new SimpleModelSupplier(ModelIds.getBlockModelId(ModBlocks.COMPACT_MOB_FARM)));
         Models.GENERATED.upload(ModelIds.getItemModelId(ModItems.SAMPLE_TAKER), TextureMap.layer0(ModItems.SAMPLE_TAKER), itemModelGenerator.writer, this::sampleTakerJsonGenerator);
