@@ -37,8 +37,11 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
     protected void init() {
         super.init();
         setEntity(handler.getEntityType());
+
         setEntityHealth(handler.getEntityHealth());
         setMaxEntityHealth(handler.getMaxEntityHealth());
+
+        if (handler.getEntityHealth() == -1 || handler.getMaxEntityHealth() == -1) resetEntityHealth();
 
         addDrawableChild(
                 CyclingButtonWidget
