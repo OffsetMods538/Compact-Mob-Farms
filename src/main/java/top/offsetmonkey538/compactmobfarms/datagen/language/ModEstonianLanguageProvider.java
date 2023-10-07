@@ -18,6 +18,7 @@ public class ModEstonianLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.SPAWNER_SHARD, "Tekitaja kild");
         translationBuilder.add(ModItems.COMPACT_MOB_FARM, "Kompaktne Olendi Farm");
         translationBuilder.add(ModItems.SPEED_UPGRADE, "Kiirendaja");
+        translationBuilder.add(ModItems.DAMAGE_UPGRADE, "Löögikahju Täiendaja");
 
         translationBuilder.add(ModItems.SAMPLE_TAKER, "Proovivõtja");
         translationBuilder.add(ModItems.FILLED_SAMPLE_TAKER, "Täidetud proovivõtja");

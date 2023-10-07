@@ -57,5 +57,16 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input('s', ModItems.SPAWNER_SHARD)
                 .criterion("has_spawner_shard_item", InventoryChangedCriterion.Conditions.items(ModItems.SPAWNER_SHARD))
                 .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder
+                .create(RecipeCategory.MISC, ModItems.DAMAGE_UPGRADE)
+                .pattern("ISI")
+                .pattern("SsS")
+                .pattern("ISI")
+                .input('I', Items.IRON_NUGGET)
+                .input('S', Items.STONE_SWORD)
+                .input('s', ModItems.SPAWNER_SHARD)
+                .criterion("has_spawner_shard_item", InventoryChangedCriterion.Conditions.items(ModItems.SPAWNER_SHARD))
+                .offerTo(exporter);
     }
 }
