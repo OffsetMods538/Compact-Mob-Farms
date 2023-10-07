@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -98,6 +99,9 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
             CompactMobFarmBlockEntity.this.currentEntity = null;
 
             CompactMobFarmBlockEntity.this.resetHealth();
+
+            if (CompactMobFarmBlockEntity.this.world == null) return;
+            CompactMobFarmBlockEntity.this.world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_LISTENERS);
         }
     };
     private final SimpleInventory sword = new SimpleInventory(1) {
@@ -328,11 +332,6 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     @Override
     public void markDirty() {
         super.markDirty();
-        // TODO:
-        //  I honestly don't remember what this is for:
-        //  if (this.world == null) return;
-        //  \
-        //  world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_LISTENERS);
     }
 
     public ItemStack getSampleTaker() {
