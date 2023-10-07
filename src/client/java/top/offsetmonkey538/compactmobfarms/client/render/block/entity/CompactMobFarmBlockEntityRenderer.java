@@ -9,9 +9,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import top.offsetmonkey538.compactmobfarms.block.CompactMobFarmBlock;
+import net.minecraft.util.math.RotationAxis;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 import top.offsetmonkey538.compactmobfarms.item.FilledSampleTakerItem;
 
@@ -49,9 +49,9 @@ public class CompactMobFarmBlockEntityRenderer implements BlockEntityRenderer<Co
 
         matrices.push();
 
-        matrices.multiply(blockEntity.getCachedState().getOrEmpty(CompactMobFarmBlock.FACING).orElse(Direction.NORTH).getRotationQuaternion());
         matrices.translate(0.5f, 0.31f, 0.5f);
         matrices.scale(scale, scale, scale);
+        matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(blockEntity.getCachedState().get(Properties.HORIZONTAL_FACING).asRotation()));
 
         MinecraftClient.getInstance().getEntityRenderDispatcher().render(entity, 0, 0, 0, 0, 0, matrices, vertexConsumers, light);
 
