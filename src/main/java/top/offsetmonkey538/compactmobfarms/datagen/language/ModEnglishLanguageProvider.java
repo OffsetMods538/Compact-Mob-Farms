@@ -17,6 +17,7 @@ public class ModEnglishLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.SPIRIT_BOTTLE, "Bottle of Spirits");
         translationBuilder.add(ModItems.SPAWNER_SHARD, "Spawner Shard");
         translationBuilder.add(ModItems.COMPACT_MOB_FARM, "Compact Mob Farm");
+        translationBuilder.add(ModItems.SPEED_UPGRADE, "Speed Upgrade");
 
         translationBuilder.add(ModItems.SAMPLE_TAKER, "Sample Taker");
         translationBuilder.add(ModItems.FILLED_SAMPLE_TAKER, "Filled Sample Taker");

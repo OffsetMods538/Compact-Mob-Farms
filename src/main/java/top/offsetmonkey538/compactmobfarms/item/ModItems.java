@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
+import top.offsetmonkey538.compactmobfarms.item.upgrade.SpeedUpgradeItem;
 
 import static top.offsetmonkey538.compactmobfarms.CompactMobFarms.id;
 
@@ -26,14 +27,15 @@ public final class ModItems {
     public static final FilledSampleTakerItem FILLED_SAMPLE_TAKER = register("filled_sample_taker", new FilledSampleTakerItem(new FabricItemSettings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item                  SPIRIT_BOTTLE       = register("spirit_bottle",       new Item(new FabricItemSettings().maxCount(16).rarity(Rarity.UNCOMMON).recipeRemainder(Items.GLASS_BOTTLE)));
     public static final Item                  SPAWNER_SHARD       = register("spawner_shard",       new Item(new FabricItemSettings().rarity(Rarity.UNCOMMON)));
+    public static final SpeedUpgradeItem      SPEED_UPGRADE       = register("speed_upgrade",       new SpeedUpgradeItem(new FabricItemSettings().rarity(Rarity.UNCOMMON).maxCount(1)));
 
-    public static final CompactMobFarmUpgradeItem DEBUG_SPEED_UPGRADE  = register("debug_speed_upgrade",  new CompactMobFarmUpgradeItem() {
+    public static final CompactMobFarmUpgradeItem DEBUG_SPEED_UPGRADE  = register("debug_speed_upgrade",  new CompactMobFarmUpgradeItem(new FabricItemSettings()) {
         @Override
         public int modifyAttackSpeed(int initialAttackSpeed, @Nullable ItemStack sword, LivingEntity target, CompactMobFarmBlockEntity blockEntity) {
             return initialAttackSpeed - 2000;
         }
     });
-    public static final CompactMobFarmUpgradeItem DEBUG_DAMAGE_UPGRADE = register("debug_damage_upgrade", new CompactMobFarmUpgradeItem() {
+    public static final CompactMobFarmUpgradeItem DEBUG_DAMAGE_UPGRADE = register("debug_damage_upgrade", new CompactMobFarmUpgradeItem(new FabricItemSettings()) {
         @Override
         public float modifyAttackDamage(float initialDamage, @Nullable ItemStack sword, LivingEntity target, CompactMobFarmBlockEntity blockEntity) {
             return initialDamage + 100;

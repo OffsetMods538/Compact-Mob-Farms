@@ -32,6 +32,7 @@ public class ModModelProvider extends FabricModelProvider {
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
         itemModelGenerator.register(ModItems.SPIRIT_BOTTLE, Models.GENERATED);
         itemModelGenerator.register(ModItems.SPAWNER_SHARD, Models.GENERATED);
+        itemModelGenerator.register(ModItems.SPEED_UPGRADE, Models.GENERATED);
         Models.GENERATED.upload(
                 ModelIds.getItemModelId(ModItems.FILLED_SAMPLE_TAKER),
                 TextureMap

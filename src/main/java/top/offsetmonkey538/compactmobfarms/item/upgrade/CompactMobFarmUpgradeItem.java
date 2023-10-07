@@ -8,8 +8,8 @@ import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 
 public abstract class CompactMobFarmUpgradeItem extends Item {
-    public CompactMobFarmUpgradeItem() {
-        super(new FabricItemSettings().maxCount(1));
+    public CompactMobFarmUpgradeItem(FabricItemSettings settings) {
+        super(settings);
     }
 
     /**

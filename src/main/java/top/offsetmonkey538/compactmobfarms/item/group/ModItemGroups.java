@@ -24,6 +24,7 @@ public final class ModItemGroups {
                         entries.add(ModItems.SPAWNER_SHARD);
                         entries.add(ModItems.COMPACT_MOB_FARM);
                         entries.add(ModItems.SAMPLE_TAKER);
+                        entries.add(ModItems.SPEED_UPGRADE);
                     })
                     .build()
     );

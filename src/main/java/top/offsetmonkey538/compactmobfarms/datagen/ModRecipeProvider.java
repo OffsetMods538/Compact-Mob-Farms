@@ -46,5 +46,16 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 .input('N', Items.IRON_NUGGET)
                 .criterion("has_iron_ingot", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
                 .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder
+                .create(RecipeCategory.MISC, ModItems.SPEED_UPGRADE)
+                .pattern("ISI")
+                .pattern("SsS")
+                .pattern("ISI")
+                .input('I', Items.IRON_NUGGET)
+                .input('S', Items.SUGAR)
+                .input('s', ModItems.SPAWNER_SHARD)
+                .criterion("has_spawner_shard_item", InventoryChangedCriterion.Conditions.items(ModItems.SPAWNER_SHARD))
+                .offerTo(exporter);
     }
 }
