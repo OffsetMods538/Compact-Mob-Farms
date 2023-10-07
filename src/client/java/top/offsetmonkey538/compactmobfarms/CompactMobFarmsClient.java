@@ -18,7 +18,7 @@ import top.offsetmonkey538.compactmobfarms.item.FilledSampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
-import top.offsetmonkey538.compactmobfarms.render.block.entity.CompactMobFarmBlockEntityRenderer;
+import top.offsetmonkey538.compactmobfarms.client.render.block.entity.CompactMobFarmBlockEntityRenderer;
 import top.offsetmonkey538.compactmobfarms.screen.ModScreenHandlers;
 
 import static top.offsetmonkey538.compactmobfarms.CompactMobFarms.*;

@@ -1,4 +1,4 @@
-package top.offsetmonkey538.compactmobfarms.render.block.entity;
+package top.offsetmonkey538.compactmobfarms.client.render.block.entity;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -10,6 +10,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import top.offsetmonkey538.compactmobfarms.block.CompactMobFarmBlock;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 import top.offsetmonkey538.compactmobfarms.item.FilledSampleTakerItem;
 
@@ -20,7 +22,6 @@ public class CompactMobFarmBlockEntityRenderer implements BlockEntityRenderer<Co
 
     @Override
     public void render(CompactMobFarmBlockEntity blockEntity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-
         final ItemStack sampleTaker = blockEntity.getSampleTaker();
         if (sampleTaker == null) return;
 
@@ -48,6 +49,7 @@ public class CompactMobFarmBlockEntityRenderer implements BlockEntityRenderer<Co
 
         matrices.push();
 
+        matrices.multiply(blockEntity.getCachedState().getOrEmpty(CompactMobFarmBlock.FACING).orElse(Direction.NORTH).getRotationQuaternion());
         matrices.translate(0.5f, 0.31f, 0.5f);
         matrices.scale(scale, scale, scale);
 
