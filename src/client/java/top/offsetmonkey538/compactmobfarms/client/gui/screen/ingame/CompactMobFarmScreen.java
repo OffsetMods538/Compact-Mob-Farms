@@ -26,8 +26,8 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
     private LivingEntity entity;
     private float maxEntityHealth = -1;
     private float currentEntityHealth = -1;
-    private Text healthText = Text.empty();
-    private int healthX;
+    private Text entityHealthText, attackSpeedText, attackDamageText = Text.empty();
+    private int entityHealthX, attackSpeedX, attackDamageX;
 
     public CompactMobFarmScreen(CompactMobFarmScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -35,11 +35,16 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
 
     @Override
     protected void init() {
+        // TODO: Maybe add an 'isInitialized' boolean and only
+        //  set the values from the handler in that case
         super.init();
         setEntity(handler.getEntityType());
 
         setEntityHealth(handler.getEntityHealth());
         setMaxEntityHealth(handler.getMaxEntityHealth());
+
+        setAttackSpeed(handler.getAttackSpeed());
+        setAttackDamage(handler.getAttackDamage());
 
         if (handler.getEntityHealth() == -1 || handler.getMaxEntityHealth() == -1) resetEntityHealth();
 
@@ -61,7 +66,10 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
     protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
         super.drawForeground(context, mouseX, mouseY);
 
-        context.drawText(this.textRenderer, healthText, healthX, 70, 0xF82423, false);
+        context.drawText(this.textRenderer, entityHealthText, entityHealthX, 70, 0xF82423, false);
+
+        context.drawText(this.textRenderer, attackSpeedText, attackSpeedX, 39, 0x404040, false);
+        context.drawText(this.textRenderer, attackDamageText, attackDamageX, 39, 0xCC3737, false);
     }
 
     @Override
@@ -131,20 +139,32 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
         this.maxEntityHealth = -1;
         this.currentEntityHealth = -1;
 
-        healthText = Text.empty();
+        entityHealthText = Text.empty();
     }
 
     public void setEntityHealth(float newHealth) {
         this.currentEntityHealth = newHealth;
 
-        healthText = Text.of(newHealth + " / " + maxEntityHealth);
-        healthX = 115 + (50 - textRenderer.getWidth(healthText)) / 2;
+        entityHealthText = Text.of(newHealth + " / " + maxEntityHealth);
+        entityHealthX = 115 + (50 - textRenderer.getWidth(entityHealthText)) / 2;
     }
 
     public void setMaxEntityHealth(float newMaxHealth) {
         this.maxEntityHealth = newMaxHealth;
 
-        healthText = Text.of(currentEntityHealth + " / " + newMaxHealth);
-        healthX = 115 + (50 - textRenderer.getWidth(healthText)) / 2;
+        entityHealthText = Text.of(currentEntityHealth + " / " + newMaxHealth);
+        entityHealthX = 115 + (50 - textRenderer.getWidth(entityHealthText)) / 2;
+    }
+
+    public void setAttackSpeed(float attackSpeed) {
+        attackSpeed /= 20;
+
+        this.attackSpeedText = Text.of("⌚ " + attackSpeed);
+        this.attackSpeedX = 42 + (22 - textRenderer.getWidth(attackSpeedText)) / 2;
+    }
+
+    public void setAttackDamage(float attackDamage) {
+        this.attackDamageText = Text.of("\uD83D\uDDE1 " + attackDamage);
+        this.attackDamageX = 78 + (22 - textRenderer.getWidth(attackDamageText)) / 2;
     }
 }

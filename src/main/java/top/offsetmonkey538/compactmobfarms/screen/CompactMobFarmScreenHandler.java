@@ -22,8 +22,7 @@ import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeIte
 
 public class CompactMobFarmScreenHandler extends ScreenHandler {
     private EntityType<?> entityType;
-    private float entityHealth;
-    private float maxEntityHealth;
+    private float entityHealth, maxEntityHealth, attackSpeed, attackDamage;
     private boolean turnedOn;
     private final ScreenHandlerContext context;
     private BiConsumer<Identifier, PacketByteBuf> sender = null;
@@ -34,6 +33,8 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         turnedOn = buf.readBoolean();
         entityHealth = buf.readFloat();
         maxEntityHealth = buf.readFloat();
+        attackSpeed = buf.readFloat();
+        attackDamage = buf.readFloat();
         if (buf.readBoolean()) this.entityType = buf.readRegistryValue(Registries.ENTITY_TYPE);
     }
 
@@ -150,5 +151,13 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
 
     public float getMaxEntityHealth() {
         return maxEntityHealth;
+    }
+
+    public float getAttackSpeed() {
+        return attackSpeed;
+    }
+
+    public float getAttackDamage() {
+        return attackDamage;
     }
 }

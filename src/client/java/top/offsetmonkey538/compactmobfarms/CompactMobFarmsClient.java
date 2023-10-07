@@ -86,5 +86,25 @@ public class CompactMobFarmsClient implements ClientModInitializer {
 
 			screen.setMaxEntityHealth(newMaxHealth);
 		});
+
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_UPDATE_ATTACK_SPEED, (client, handler, buf, responseSender) -> {
+			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
+
+			float newAttackSpeed = buf.readFloat();
+
+			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
+
+			screen.setAttackSpeed(newAttackSpeed);
+		});
+
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_UPDATE_ATTACK_DAMAGE, (client, handler, buf, responseSender) -> {
+			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
+
+			float newAttackDamage = buf.readFloat();
+
+			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
+
+			screen.setAttackDamage(newAttackDamage);
+		});
 	}
 }

@@ -78,6 +78,9 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
             CompactMobFarmBlockEntity.this.markDirty();
 
             killTimer = Math.min(killTimer, getAttackSpeed(getSword(), currentEntity));
+
+            sendAttackSpeedUpgradePacket();
+            sendAttackDamageUpgradePacket();
         }
     };
     private final SimpleInventory sampleTaker = new SimpleInventory(1) {
@@ -119,6 +122,8 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         public void markDirty() {
             super.markDirty();
             CompactMobFarmBlockEntity.this.markDirty();
+
+            sendAttackDamageUpgradePacket();
         }
     };
 
@@ -197,6 +202,22 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         buf.writeRegistryValue(Registries.ENTITY_TYPE, newEntity);
 
         sendPacket(ModPackets.GUI_ENTITY_CHANGED, buf);
+    }
+
+    private void sendAttackSpeedUpgradePacket() {
+        PacketByteBuf buf = PacketByteBufs.create();
+
+        buf.writeFloat(getAttackSpeed(getSword(), currentEntity));
+
+        sendPacket(ModPackets.GUI_UPDATE_ATTACK_SPEED, buf);
+    }
+
+    private void sendAttackDamageUpgradePacket() {
+        PacketByteBuf buf = PacketByteBufs.create();
+
+        buf.writeFloat(getAttackDamage(getSword(), currentEntity));
+
+        sendPacket(ModPackets.GUI_UPDATE_ATTACK_DAMAGE, buf);
     }
 
     private void sendPacket(Identifier packet, PacketByteBuf buf) {
@@ -278,6 +299,8 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         buf.writeBoolean(isTurnedOn);
         buf.writeFloat(currentEntityHealth);
         buf.writeFloat(maxEntityHealth);
+        buf.writeFloat(getAttackSpeed(getSword(), currentEntity));
+        buf.writeFloat(getAttackDamage(getSword(), currentEntity));
         buf.writeBoolean(currentEntity != null);
         if (currentEntity != null) buf.writeRegistryValue(Registries.ENTITY_TYPE, currentEntity.getType());
     }
