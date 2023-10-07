@@ -28,6 +28,7 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
     private float currentEntityHealth = -1;
     private Text entityHealthText, attackSpeedText, attackDamageText = Text.empty();
     private int entityHealthX, attackSpeedX, attackDamageX;
+    private boolean isInitialized;
 
     public CompactMobFarmScreen(CompactMobFarmScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -35,18 +36,23 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
 
     @Override
     protected void init() {
-        // TODO: Maybe add an 'isInitialized' boolean and only
-        //  set the values from the handler in that case
         super.init();
-        setEntity(handler.getEntityType());
 
-        setEntityHealth(handler.getEntityHealth());
-        setMaxEntityHealth(handler.getMaxEntityHealth());
+        // We don't want to get the values from the handler
+        //  when the window is resized, because the handler
+        //  doesn't get updated with new data.
+        if (!isInitialized) {
+            isInitialized = true;
+            setEntity(handler.getEntityType());
 
-        setAttackSpeed(handler.getAttackSpeed());
-        setAttackDamage(handler.getAttackDamage());
+            setEntityHealth(handler.getEntityHealth());
+            setMaxEntityHealth(handler.getMaxEntityHealth());
 
-        if (handler.getEntityHealth() == -1 || handler.getMaxEntityHealth() == -1) resetEntityHealth();
+            setAttackSpeed(handler.getAttackSpeed());
+            setAttackDamage(handler.getAttackDamage());
+
+            if (handler.getEntityHealth() == -1 || handler.getMaxEntityHealth() == -1) resetEntityHealth();
+        }
 
         addDrawableChild(
                 CyclingButtonWidget
@@ -55,6 +61,7 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
                         .omitKeyText()
                         .build(x + 10,  y + 14, 20, 20, null, (button, value) -> {
                             if (client == null || client.interactionManager == null) return;
+                            handler.setTurnedOn(value);
                             this.client.interactionManager.clickButton(handler.syncId, value ? 1 : 0);
                         })
         );

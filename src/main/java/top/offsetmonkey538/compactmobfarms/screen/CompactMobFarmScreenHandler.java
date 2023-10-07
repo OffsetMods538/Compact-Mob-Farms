@@ -141,6 +141,10 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         return turnedOn;
     }
 
+    public void setTurnedOn(boolean turnedOn) {
+        this.turnedOn = turnedOn;
+    }
+
     public EntityType<?> getEntityType() {
         return entityType;
     }
