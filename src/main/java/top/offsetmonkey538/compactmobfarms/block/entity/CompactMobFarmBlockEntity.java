@@ -130,6 +130,12 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         if (world.isClient()) return;
 
         // Set entity if it doesn't exist
+        if (blockEntity.currentEntity == null) {
+            if (!blockEntity.setCurrentEntity()) return;
+
+            blockEntity.setMaxEntityHealth(blockEntity.currentEntity.getMaxHealth());
+            blockEntity.setCurrentEntityHealth(blockEntity.maxEntityHealth);
+        }
         if (blockEntity.currentEntity == null && !blockEntity.setCurrentEntity()) return;
 
         if (!blockEntity.isTurnedOn) return;
@@ -145,9 +151,6 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
 
     private void checkHealthAndKillEntity() {
         if (!(world instanceof ServerWorld serverWorld)) return;
-
-        if (maxEntityHealth == -1) setMaxEntityHealth(currentEntity.getMaxHealth());
-        if (currentEntityHealth == -1) currentEntityHealth = maxEntityHealth;
 
         final FakePlayer player = FakePlayer.get(serverWorld);
         if (this.getSword() != null) {
