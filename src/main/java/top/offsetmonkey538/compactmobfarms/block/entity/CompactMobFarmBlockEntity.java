@@ -75,6 +75,8 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         public void markDirty() {
             super.markDirty();
             CompactMobFarmBlockEntity.this.markDirty();
+
+            killTimer = Math.min(killTimer, getAttackSpeed(getSword(), currentEntity));
         }
     };
     private final SimpleInventory sampleTaker = new SimpleInventory(1) {
