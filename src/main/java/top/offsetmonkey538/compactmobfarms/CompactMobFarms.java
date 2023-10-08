@@ -15,9 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.ModBlockEntityTypes;
+import top.offsetmonkey538.compactmobfarms.config.ModConfig;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.group.ModItemGroups;
 import top.offsetmonkey538.compactmobfarms.screen.ModScreenHandlers;
+import top.offsetmonkey538.monkeyconfig538.ConfigManager;
 
 public class CompactMobFarms implements ModInitializer {
 	public static final String MOD_ID = "compact-mob-farms";
@@ -25,7 +27,8 @@ public class CompactMobFarms implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		// Do stuff
+		ConfigManager.init(new ModConfig(), MOD_ID);
+
 		ModBlocks.register();
 		ModItems.register();
 		ModItemGroups.register();
@@ -49,5 +52,9 @@ public class CompactMobFarms implements ModInitializer {
 
 	public static Identifier id(String path) {
 		return new Identifier(MOD_ID, path);
+	}
+
+	public static ModConfig config() {
+		return (ModConfig) ConfigManager.get(MOD_ID);
 	}
 }
