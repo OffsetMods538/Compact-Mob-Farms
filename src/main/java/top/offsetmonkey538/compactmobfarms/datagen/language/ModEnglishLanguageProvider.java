@@ -19,6 +19,10 @@ public class ModEnglishLanguageProvider extends FabricLanguageProvider {
         translationBuilder.add(ModItems.COMPACT_MOB_FARM, "Compact Mob Farm");
         translationBuilder.add(ModItems.SPEED_UPGRADE, "Speed Upgrade");
         translationBuilder.add(ModItems.DAMAGE_UPGRADE, "Damage Upgrade");
+        translationBuilder.add(ModItems.TIER_1_UPGRADE, "Tier 1 Upgrade");
+        translationBuilder.add(ModItems.TIER_2_UPGRADE, "Tier 2 Upgrade");
+        translationBuilder.add(ModItems.TIER_3_UPGRADE, "Tier 3 Upgrade");
+        translationBuilder.add(ModItems.TIER_4_UPGRADE, "Tier 4 Upgrade");
 
         translationBuilder.add(ModItems.SAMPLE_TAKER, "Sample Taker");
         translationBuilder.add(ModItems.FILLED_SAMPLE_TAKER, "Filled Sample Taker");

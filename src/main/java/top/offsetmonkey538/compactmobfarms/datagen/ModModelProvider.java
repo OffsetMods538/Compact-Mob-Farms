@@ -34,6 +34,10 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.register(ModItems.SPAWNER_SHARD, Models.GENERATED);
         itemModelGenerator.register(ModItems.SPEED_UPGRADE, Models.GENERATED);
         itemModelGenerator.register(ModItems.DAMAGE_UPGRADE, Models.GENERATED);
+        itemModelGenerator.register(ModItems.TIER_1_UPGRADE, Models.GENERATED);
+        itemModelGenerator.register(ModItems.TIER_2_UPGRADE, Models.GENERATED);
+        itemModelGenerator.register(ModItems.TIER_3_UPGRADE, Models.GENERATED);
+        itemModelGenerator.register(ModItems.TIER_4_UPGRADE, Models.GENERATED);
         Models.GENERATED.upload(
                 ModelIds.getItemModelId(ModItems.FILLED_SAMPLE_TAKER),
                 TextureMap

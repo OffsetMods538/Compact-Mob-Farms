@@ -28,6 +28,10 @@ public final class ModItems {
     public static final FilledSampleTakerItem FILLED_SAMPLE_TAKER = register("filled_sample_taker", new FilledSampleTakerItem(new FabricItemSettings().maxCount(16).rarity(Rarity.UNCOMMON)));
     public static final Item                  SPIRIT_BOTTLE       = register("spirit_bottle",       new Item(new FabricItemSettings().maxCount(16).rarity(Rarity.UNCOMMON).recipeRemainder(Items.GLASS_BOTTLE)));
     public static final Item                  SPAWNER_SHARD       = register("spawner_shard",       new Item(new FabricItemSettings().rarity(Rarity.UNCOMMON)));
+    public static final TierUpgradeItem       TIER_1_UPGRADE      = register("tier_1_upgrade",      new TierUpgradeItem(new FabricItemSettings().rarity(Rarity.UNCOMMON)));
+    public static final TierUpgradeItem       TIER_2_UPGRADE      = register("tier_2_upgrade",      new TierUpgradeItem(new FabricItemSettings().rarity(Rarity.UNCOMMON)));
+    public static final TierUpgradeItem       TIER_3_UPGRADE      = register("tier_3_upgrade",      new TierUpgradeItem(new FabricItemSettings().rarity(Rarity.RARE)));
+    public static final TierUpgradeItem       TIER_4_UPGRADE      = register("tier_4_upgrade",      new TierUpgradeItem(new FabricItemSettings().rarity(Rarity.EPIC)));
     public static final SpeedUpgradeItem      SPEED_UPGRADE       = register("speed_upgrade",       new SpeedUpgradeItem(new FabricItemSettings().rarity(Rarity.UNCOMMON)));
     public static final DamageUpgradeItem     DAMAGE_UPGRADE      = register("damage_upgrade",      new DamageUpgradeItem(new FabricItemSettings().rarity(Rarity.UNCOMMON)));
 
