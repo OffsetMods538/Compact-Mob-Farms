@@ -51,6 +51,12 @@ import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 
 public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
+    public static final String DROP_INVENTORY_NBT_KEY = "DropInventory";
+    public static final String SAMPLE_TAKER_NBT_KEY = "SampleTaker";
+    public static final String UPGRADES_NBT_KEY = "Upgrades";
+    public static final String SWORD_NBT_KEY = "Sword";
+    public static final String TURNED_ON_NBT_KEY = "Sword";
+
     public static final int DEFAULT_ATTACK_SPEED = 30 * 20; // 30 seconds, multiplied by 20 because it needs to be in ticks.
     public static final Item NUGGET_OF_EXPERIENCE = Registries.ITEM.get(new Identifier("create:experience_nugget"));
 
@@ -307,11 +313,11 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        nbt.put("DropInventory", dropInventory.toNbtList());
-        nbt.put("SampleTaker", sampleTaker.toNbtList());
-        nbt.put("Upgrades", upgrades.toNbtList());
-        nbt.put("Sword", sword.toNbtList());
-        nbt.putBoolean("TurnedOn", isTurnedOn);
+        nbt.put(DROP_INVENTORY_NBT_KEY, dropInventory.toNbtList());
+        nbt.put(SAMPLE_TAKER_NBT_KEY, sampleTaker.toNbtList());
+        nbt.put(UPGRADES_NBT_KEY, upgrades.toNbtList());
+        nbt.put(SWORD_NBT_KEY, sword.toNbtList());
+        nbt.putBoolean(TURNED_ON_NBT_KEY, isTurnedOn);
 
         super.writeNbt(nbt);
     }
@@ -320,11 +326,11 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
 
-        dropInventory.fromNbt(nbt.getList("DropInventory", NbtElement.COMPOUND_TYPE));
-        sampleTaker.readNbtList(nbt.getList("SampleTaker", NbtElement.COMPOUND_TYPE));
-        upgrades.readNbtList(nbt.getList("Upgrades", NbtElement.COMPOUND_TYPE));
-        sword.readNbtList(nbt.getList("Sword", NbtElement.COMPOUND_TYPE));
-        isTurnedOn = nbt.getBoolean("TurnedOn");
+        dropInventory.fromNbt(nbt.getList(DROP_INVENTORY_NBT_KEY, NbtElement.COMPOUND_TYPE));
+        sampleTaker.readNbtList(nbt.getList(SAMPLE_TAKER_NBT_KEY, NbtElement.COMPOUND_TYPE));
+        upgrades.readNbtList(nbt.getList(UPGRADES_NBT_KEY, NbtElement.COMPOUND_TYPE));
+        sword.readNbtList(nbt.getList(SWORD_NBT_KEY, NbtElement.COMPOUND_TYPE));
+        isTurnedOn = nbt.getBoolean(TURNED_ON_NBT_KEY);
     }
 
     @Nullable
