@@ -1,0 +1,15 @@
+{
+    "TIER_0": [
+        "minecraft:cow",
+        "minecraft:sheep",
+        "minecraft:tnt"
+    ],
+    "TIER_2": [
+        "minecraft:wither"
+    ],
+    "TIER_3": [
+        "I am gonna crash deez nuts",
+        "minecraft:skeleton",
+        "i:exist_maybe"
+    ]
+}
