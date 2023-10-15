@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
+import net.minecraft.data.server.recipe.ComplexRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
@@ -11,6 +12,7 @@ import net.minecraft.item.Items;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.tag.ItemTags;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
+import top.offsetmonkey538.compactmobfarms.recipe.ModRecipes;
 
 public class ModRecipeProvider extends FabricRecipeProvider {
     public ModRecipeProvider(FabricDataOutput output) {
@@ -19,6 +21,10 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 
     @Override
     public void generate(Consumer<RecipeJsonProvider> exporter) {
+        ComplexRecipeJsonBuilder
+                .create(ModRecipes.CLONE_FILLED_SAMPLE_TAKER)
+                .offerTo(exporter, "clone_filled_sample_taker");
+
         ShapelessRecipeJsonBuilder
                 .create(RecipeCategory.MISC, ModItems.SPAWNER_SHARD)
                 .input(ModItems.SPIRIT_BOTTLE, 2)

@@ -18,6 +18,7 @@ import top.offsetmonkey538.compactmobfarms.block.entity.ModBlockEntityTypes;
 import top.offsetmonkey538.compactmobfarms.config.ModConfig;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.group.ModItemGroups;
+import top.offsetmonkey538.compactmobfarms.recipe.ModRecipes;
 import top.offsetmonkey538.compactmobfarms.screen.ModScreenHandlers;
 import top.offsetmonkey538.monkeyconfig538.ConfigManager;
 
@@ -34,6 +35,7 @@ public class CompactMobFarms implements ModInitializer {
 		ModItemGroups.register();
 		ModBlockEntityTypes.register();
 		ModScreenHandlers.register();
+		ModRecipes.register();
 
 		//noinspection UnstableApiUsage
 		ItemStorage.SIDED.registerForBlockEntity((block, direction) -> block.getDropInventory(), ModBlockEntityTypes.COMPACT_MOB_FARM);
