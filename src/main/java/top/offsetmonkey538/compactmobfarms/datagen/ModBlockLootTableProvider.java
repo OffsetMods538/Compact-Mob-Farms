@@ -20,6 +20,7 @@ public class ModBlockLootTableProvider extends FabricBlockLootTableProvider {
                 CopyNbtLootFunction.builder(ContextLootNbtProvider.BLOCK_ENTITY)
                         .withOperation(DROP_INVENTORY_NBT_KEY, BLOCK_ENTITY_TAG_KEY + "." + DROP_INVENTORY_NBT_KEY)
                         .withOperation(SAMPLE_TAKER_NBT_KEY, BLOCK_ENTITY_TAG_KEY + "." + SAMPLE_TAKER_NBT_KEY)
+                        .withOperation(TIER_UPGRADE_NBT_KEY, BLOCK_ENTITY_TAG_KEY + "." + TIER_UPGRADE_NBT_KEY)
                         .withOperation(UPGRADES_NBT_KEY, BLOCK_ENTITY_TAG_KEY + "." + UPGRADES_NBT_KEY)
                         .withOperation(SWORD_NBT_KEY, BLOCK_ENTITY_TAG_KEY + "." + SWORD_NBT_KEY)
                         .withOperation(TURNED_ON_NBT_KEY, BLOCK_ENTITY_TAG_KEY + "." + TURNED_ON_NBT_KEY)

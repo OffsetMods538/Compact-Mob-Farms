@@ -53,6 +53,7 @@ import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
 public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
     public static final String DROP_INVENTORY_NBT_KEY = "DropInventory";
     public static final String SAMPLE_TAKER_NBT_KEY = "SampleTaker";
+    public static final String TIER_UPGRADE_NBT_KEY = "TierUpgrade";
     public static final String UPGRADES_NBT_KEY = "Upgrades";
     public static final String SWORD_NBT_KEY = "Sword";
     public static final String TURNED_ON_NBT_KEY = "Sword";
@@ -66,7 +67,18 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     private float currentEntityHealth = -1;
     private LivingEntity currentEntity = null;
     private final List<BiConsumer<Identifier, PacketByteBuf>> packetSenders = new ArrayList<>();
-    final CompactMobFarmInventory dropInventory = new CompactMobFarmInventory();
+    private final CompactMobFarmInventory dropInventory = new CompactMobFarmInventory();
+    private final SimpleInventory tierUpgrade = new SimpleInventory(1) {
+        @Override
+        public int getMaxCountPerStack() {
+            return 1;
+        }
+
+        @Override
+        public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
+            return false;
+        }
+    };
     private final SimpleInventory upgrades = new SimpleInventory(4) {
         @Override
         public int getMaxCountPerStack() {
@@ -292,7 +304,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new CompactMobFarmScreenHandler(syncId, playerInventory, sampleTaker, upgrades, sword, ScreenHandlerContext.create(this.world, this.pos));
+        return new CompactMobFarmScreenHandler(syncId, playerInventory, sampleTaker, tierUpgrade, upgrades, sword, ScreenHandlerContext.create(this.world, this.pos));
     }
 
     @Override
@@ -315,6 +327,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     protected void writeNbt(NbtCompound nbt) {
         nbt.put(DROP_INVENTORY_NBT_KEY, dropInventory.toNbtList());
         nbt.put(SAMPLE_TAKER_NBT_KEY, sampleTaker.toNbtList());
+        nbt.put(TIER_UPGRADE_NBT_KEY, tierUpgrade.toNbtList());
         nbt.put(UPGRADES_NBT_KEY, upgrades.toNbtList());
         nbt.put(SWORD_NBT_KEY, sword.toNbtList());
         nbt.putBoolean(TURNED_ON_NBT_KEY, isTurnedOn);
@@ -328,6 +341,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
 
         dropInventory.fromNbt(nbt.getList(DROP_INVENTORY_NBT_KEY, NbtElement.COMPOUND_TYPE));
         sampleTaker.readNbtList(nbt.getList(SAMPLE_TAKER_NBT_KEY, NbtElement.COMPOUND_TYPE));
+        tierUpgrade.readNbtList(nbt.getList(TIER_UPGRADE_NBT_KEY, NbtElement.COMPOUND_TYPE));
         upgrades.readNbtList(nbt.getList(UPGRADES_NBT_KEY, NbtElement.COMPOUND_TYPE));
         sword.readNbtList(nbt.getList(SWORD_NBT_KEY, NbtElement.COMPOUND_TYPE));
         isTurnedOn = nbt.getBoolean(TURNED_ON_NBT_KEY);
@@ -368,6 +382,10 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
 
     public ItemStack getSampleTaker() {
         return sampleTaker.getStack(0);
+    }
+
+    public ItemStack getTierUpgrade() {
+        return tierUpgrade.getStack(0);
     }
 
     public ItemStack getSword() {
