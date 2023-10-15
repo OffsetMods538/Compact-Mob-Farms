@@ -26,6 +26,10 @@ public final class ModItemGroups {
                         entries.add(ModItems.SAMPLE_TAKER);
                         entries.add(ModItems.SPEED_UPGRADE);
                         entries.add(ModItems.DAMAGE_UPGRADE);
+                        entries.add(ModItems.TIER_1_UPGRADE);
+                        entries.add(ModItems.TIER_2_UPGRADE);
+                        entries.add(ModItems.TIER_3_UPGRADE);
+                        entries.add(ModItems.TIER_4_UPGRADE);
                     })
                     .build()
     );
