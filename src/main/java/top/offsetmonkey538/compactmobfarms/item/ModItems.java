@@ -28,8 +28,8 @@ public final class ModItems {
     public static final FilledSampleTakerItem FILLED_SAMPLE_TAKER = register("filled_sample_taker", new FilledSampleTakerItem(new FabricItemSettings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item                  SPIRIT_BOTTLE       = register("spirit_bottle",       new Item(new FabricItemSettings().maxCount(16).rarity(Rarity.UNCOMMON).recipeRemainder(Items.GLASS_BOTTLE)));
     public static final Item                  SPAWNER_SHARD       = register("spawner_shard",       new Item(new FabricItemSettings().rarity(Rarity.UNCOMMON)));
-    public static final SpeedUpgradeItem      SPEED_UPGRADE       = register("speed_upgrade",       new SpeedUpgradeItem(new FabricItemSettings().rarity(Rarity.UNCOMMON).maxCount(1)));
-    public static final DamageUpgradeItem     DAMAGE_UPGRADE      = register("damage_upgrade",      new DamageUpgradeItem(new FabricItemSettings().rarity(Rarity.UNCOMMON).maxCount(1)));
+    public static final SpeedUpgradeItem      SPEED_UPGRADE       = register("speed_upgrade",       new SpeedUpgradeItem(new FabricItemSettings().rarity(Rarity.UNCOMMON)));
+    public static final DamageUpgradeItem     DAMAGE_UPGRADE      = register("damage_upgrade",      new DamageUpgradeItem(new FabricItemSettings().rarity(Rarity.UNCOMMON)));
 
     public static final CompactMobFarmUpgradeItem DEBUG_SPEED_UPGRADE  = register("debug_speed_upgrade",  new CompactMobFarmUpgradeItem(new FabricItemSettings()) {
         @Override
