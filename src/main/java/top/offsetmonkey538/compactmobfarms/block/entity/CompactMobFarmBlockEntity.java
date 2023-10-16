@@ -56,7 +56,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     public static final String TIER_UPGRADE_NBT_KEY = "TierUpgrade";
     public static final String UPGRADES_NBT_KEY = "Upgrades";
     public static final String SWORD_NBT_KEY = "Sword";
-    public static final String TURNED_ON_NBT_KEY = "Sword";
+    public static final String TURNED_ON_NBT_KEY = "IsTurnedOn";
 
     public static final int DEFAULT_ATTACK_SPEED = 30 * 20; // 30 seconds, multiplied by 20 because it needs to be in ticks.
     public static final Item NUGGET_OF_EXPERIENCE = Registries.ITEM.get(new Identifier("create:experience_nugget"));
