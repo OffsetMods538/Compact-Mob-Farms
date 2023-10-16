@@ -1,6 +1,7 @@
 package top.offsetmonkey538.compactmobfarms.screen;
 
 import java.util.function.BiConsumer;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,12 +15,15 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
-import top.offsetmonkey538.compactmobfarms.item.ModItems;
+import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
+import top.offsetmonkey538.compactmobfarms.item.FilledSampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.item.TierUpgradeItem;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
+import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 
 public class CompactMobFarmScreenHandler extends ScreenHandler {
     private EntityType<?> entityType;
@@ -62,7 +66,23 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         this.addSlot(new Slot(sampleTaker, 0, 35, 16) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return context.get((world, pos) -> stack.isOf(ModItems.FILLED_SAMPLE_TAKER), false);
+                return context.get((world, pos) -> {
+                    if (!(stack.getItem() instanceof FilledSampleTakerItem)) return false;
+                    if (!(world.getBlockEntity(pos) instanceof CompactMobFarmBlockEntity blockEntity)) return false;
+
+                    EntityType<?> entity = FilledSampleTakerItem.getSampledEntityType(stack);
+                    if (entity == null) return false; // Prolly shouldn't happen, but I guess I gotta make IntelliJ happy
+
+                    if (TierUpgradeItem.isSupported(blockEntity.getTierUpgrade(), entity)) return true;
+
+                    PacketByteBuf buf = PacketByteBufs.create();
+
+                    buf.writeText(Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_insert_sample_taker", Text.translatable(entity.getTranslationKey()), EntityTiers.INSTANCE.requiredTierFor(entity)));
+
+                    blockEntity.sendPacket(ModPackets.GUI_DISPLAY_PROBLEM_MESSAGE, buf);
+
+                    return false;
+                }, false);
             }
         });
 
@@ -71,6 +91,27 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
             @Override
             public boolean canInsert(ItemStack stack) {
                 return stack.getItem() instanceof TierUpgradeItem;
+            }
+
+            @Override
+            public boolean canTakeItems(PlayerEntity playerEntity) {
+                return context.get((world, pos) -> {
+                    if (!(world.getBlockEntity(pos) instanceof CompactMobFarmBlockEntity blockEntity)) return false;
+
+                    if (blockEntity.getCurrentEntity() == null) return true;
+                    final EntityType<?> currentType = blockEntity.getCurrentEntity().getType();
+
+                    if (EntityTiers.INSTANCE.isSupported(currentType) && EntityTiers.INSTANCE.tier0Supports(currentType))
+                        return true;
+
+                    PacketByteBuf buf = PacketByteBufs.create();
+
+                    buf.writeText(Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_remove_tier_upgrade", Text.translatable(currentType.getTranslationKey())));
+
+                    blockEntity.sendPacket(ModPackets.GUI_DISPLAY_PROBLEM_MESSAGE, buf);
+
+                    return false;
+                }, false);
             }
         });
 

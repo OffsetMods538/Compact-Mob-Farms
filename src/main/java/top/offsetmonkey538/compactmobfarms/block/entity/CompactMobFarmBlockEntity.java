@@ -238,7 +238,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         sendPacket(ModPackets.GUI_UPDATE_ATTACK_DAMAGE, buf);
     }
 
-    private void sendPacket(Identifier packet, PacketByteBuf buf) {
+    public void sendPacket(Identifier packet, PacketByteBuf buf) {
         for (BiConsumer<Identifier, PacketByteBuf> sender : packetSenders) {
             sender.accept(packet, buf);
         }
@@ -394,6 +394,10 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
 
     public CompactMobFarmInventory getDropInventory() {
         return dropInventory;
+    }
+
+    public LivingEntity getCurrentEntity() {
+        return currentEntity;
     }
 
     public void setTurnedOn(boolean turnedOn) {

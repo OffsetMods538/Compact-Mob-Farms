@@ -26,8 +26,10 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
     private LivingEntity entity;
     private float maxEntityHealth = -1;
     private float currentEntityHealth = -1;
-    private Text entityHealthText, attackSpeedText, attackDamageText = Text.empty();
-    private int entityHealthX, attackSpeedX, attackDamageX;
+    private Text problemMessageText, entityHealthText, attackSpeedText, attackDamageText = Text.empty();
+    private int problemMessageX, entityHealthX, attackSpeedX, attackDamageX;
+    private int problemMessageTimer;
+    private boolean drawProblemMessage;
     private boolean isInitialized;
 
     public CompactMobFarmScreen(CompactMobFarmScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -71,7 +73,10 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
 
     @Override
     protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
-        super.drawForeground(context, mouseX, mouseY);
+        if (!drawProblemMessage) context.drawText(this.textRenderer, this.title, this.titleX, this.titleY, 0x404040, false);
+        else context.drawText(this.textRenderer, this.problemMessageText, this.problemMessageX, this.titleY, 0xF82423, false);
+
+        context.drawText(this.textRenderer, this.playerInventoryTitle, this.playerInventoryTitleX, this.playerInventoryTitleY, 0x404040, false);
 
         context.drawText(this.textRenderer, entityHealthText, entityHealthX, 70, 0xF82423, false);
 
@@ -121,6 +126,15 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
         super.render(context, mouseX, mouseY, delta);
 
         drawMouseoverTooltip(context, mouseX, mouseY);
+    }
+
+    @Override
+    protected void handledScreenTick() {
+        super.handledScreenTick();
+
+        if (!drawProblemMessage) return;
+
+        if (--problemMessageTimer <= 0) drawProblemMessage = false;
     }
 
     public void setEntity(EntityType<?> entityType) {
@@ -173,5 +187,12 @@ public class CompactMobFarmScreen extends HandledScreen<CompactMobFarmScreenHand
     public void setAttackDamage(float attackDamage) {
         this.attackDamageText = Text.of("\uD83D\uDDE1 " + attackDamage);
         this.attackDamageX = 78 + (22 - textRenderer.getWidth(attackDamageText)) / 2;
+    }
+
+    public void displayProblemMessage(Text problemMessage) {
+        problemMessageText = problemMessage;
+        problemMessageX = (backgroundWidth - textRenderer.getWidth(problemMessageText)) / 2;
+        drawProblemMessage = true;
+        problemMessageTimer = 3 * 20; // 3 seconds * 20 ticks/second
     }
 }

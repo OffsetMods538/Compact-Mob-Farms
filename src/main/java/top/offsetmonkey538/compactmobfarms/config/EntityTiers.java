@@ -77,6 +77,17 @@ public class EntityTiers {
         TIER_4.remove(entity);
     }
 
+    public int requiredTierFor(EntityType<?> entity) {
+        if (!isSupported(entity)) return -1;
+        if (TIER_0.contains(entity)) return 0;
+        if (TIER_1.contains(entity)) return 1;
+        if (TIER_2.contains(entity)) return 2;
+        if (TIER_3.contains(entity)) return 3;
+        if (TIER_4.contains(entity)) return 4;
+
+        return -1;
+    }
+
     public boolean isSupported(EntityType<?> entity) {
         if (UNSUPPORTED.contains(entity)) return false;
         return anySupports(entity);

@@ -11,14 +11,15 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.registry.Registries;
+import net.minecraft.text.Text;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.ModBlockEntityTypes;
 import top.offsetmonkey538.compactmobfarms.client.gui.screen.ingame.CompactMobFarmScreen;
+import top.offsetmonkey538.compactmobfarms.client.render.block.entity.CompactMobFarmBlockEntityRenderer;
 import top.offsetmonkey538.compactmobfarms.item.FilledSampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
-import top.offsetmonkey538.compactmobfarms.client.render.block.entity.CompactMobFarmBlockEntityRenderer;
 import top.offsetmonkey538.compactmobfarms.screen.ModScreenHandlers;
 
 import static top.offsetmonkey538.compactmobfarms.CompactMobFarms.*;
@@ -105,6 +106,16 @@ public class CompactMobFarmsClient implements ClientModInitializer {
 			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
 
 			screen.setAttackDamage(newAttackDamage);
+		});
+
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_DISPLAY_PROBLEM_MESSAGE, (client, handler, buf, responseSender) -> {
+			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
+
+			Text problemMessage = buf.readText();
+
+			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
+
+			screen.displayProblemMessage(problemMessage);
 		});
 	}
 }
