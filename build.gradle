@@ -70,6 +70,13 @@ repositories {
 			includeGroup "top.offsetmonkey538"
 		}
 	}
+	maven {
+		name = "TerraformersMC"
+		url = "https://maven.terraformersmc.com/"
+		content {
+			includeGroup "dev.emi"
+		}
+	}
 }
 
 dependencies {
@@ -88,6 +95,10 @@ dependencies {
 
 	// Config library
 	includeModImplementation "top.offsetmonkey538:monkeyconfig538:${project.monkeyconfig538_version}"
+
+	// EMI
+	modCompileOnly  "dev.emi:emi-fabric:${project.emi_version}:api"
+	modLocalRuntime "dev.emi:emi-fabric:${project.emi_version}"
 }
 
 processResources {

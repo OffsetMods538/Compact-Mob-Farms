@@ -27,6 +27,9 @@
 		],
 		"preLaunch": [
 			"com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
+		],
+		"emi": [
+			"top.offsetmonkey538.compactmobfarms.emi.CompactMobFarmsEmiPlugin"
 		]
 	},
 	"mixins": [
@@ -42,6 +45,7 @@
 		"minecraft": "${supportedMinecraftVersions}"
 	},
 	"suggests": {
-		"create": ">=0.4"
+		"create": ">=0.4",
+		"emi": "*"
 	}
 }
