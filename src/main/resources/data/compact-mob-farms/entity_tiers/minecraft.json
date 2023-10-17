@@ -17,7 +17,6 @@
         "minecraft:ocelot",
         "minecraft:parrot",
         "minecraft:pig",
-        "minecraft:rabbit",
         "minecraft:salmon",
         "minecraft:sheep",
         "minecraft:skeleton_horse",
@@ -67,8 +66,8 @@
         "minecraft:ravager",
         "minecraft:skeleton",
         "minecraft:slime",
-        "stray"
-
+        "minecraft:stray",
+        "minecraft:rabbit"
     ],
     "TIER_2": [
         "minecraft:iron_golem",
