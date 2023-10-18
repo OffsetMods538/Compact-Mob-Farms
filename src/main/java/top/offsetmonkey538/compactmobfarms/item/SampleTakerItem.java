@@ -20,6 +20,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
 
 public class SampleTakerItem extends Item {
     public static final String SAMPLED_ENTITY_KEY = "SampledEntity";
@@ -36,7 +37,7 @@ public class SampleTakerItem extends Item {
         final List<UUID> samplesCollected = getSamplesCollected(stack);
         final UUID targetUuid = targetEntity.getUuid();
 
-        if (samplesCollected.contains(targetUuid) || (sampledEntiyIdentifier != null && !sampledEntiyIdentifier.equals(targetEntityIdentifier))) return super.useOnEntity(stack, user, targetEntity, hand);
+        if (!EntityTiers.INSTANCE.isSupported(targetEntity.getType()) || samplesCollected.contains(targetUuid) || (sampledEntiyIdentifier != null && !sampledEntiyIdentifier.equals(targetEntityIdentifier))) return super.useOnEntity(stack, user, targetEntity, hand);
 
 
         if (user.getWorld().isClient()) return ActionResult.SUCCESS;
