@@ -16,6 +16,7 @@ import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.ModBlockEntityTypes;
 import top.offsetmonkey538.compactmobfarms.client.gui.screen.ingame.CompactMobFarmScreen;
 import top.offsetmonkey538.compactmobfarms.client.render.block.entity.CompactMobFarmBlockEntityRenderer;
+import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
 import top.offsetmonkey538.compactmobfarms.item.FilledSampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
@@ -116,6 +117,11 @@ public class CompactMobFarmsClient implements ClientModInitializer {
 			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
 
 			screen.displayProblemMessage(problemMessage);
+		});
+
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.UPDATE_ENTITY_TIER_LIST, (client, handler, buf, responseSender) -> {
+			EntityTiers.INSTANCE.clear();
+			EntityTiers.INSTANCE.fromUpdatePacket(buf);
 		});
 	}
 }

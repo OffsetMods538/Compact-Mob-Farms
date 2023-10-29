@@ -1,11 +1,17 @@
 package top.offsetmonkey538.compactmobfarms.config;
 
+import blue.endless.jankson.annotation.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.entity.EntityType;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 
 public class EntityTiers {
     public static final EntityTiers INSTANCE = new EntityTiers();
+
+    @SerializedName("IGNORE_ME_PLEASE")
+    public List<EntityType<?>> SUPPORTED = new ArrayList<>();
 
     public List<EntityType<?>> UNSUPPORTED = new ArrayList<>();
     public List<EntityType<?>> TIER_0 = new ArrayList<>();
@@ -60,6 +66,7 @@ public class EntityTiers {
     }
 
     public void clear() {
+        SUPPORTED.clear();
         UNSUPPORTED.clear();
         TIER_0.clear();
         TIER_1.clear();
@@ -75,6 +82,20 @@ public class EntityTiers {
         TIER_2.remove(entity);
         TIER_3.remove(entity);
         TIER_4.remove(entity);
+    }
+
+    public List<EntityType<?>> getSupported() {
+        if (!SUPPORTED.isEmpty()) return SUPPORTED;
+
+        SUPPORTED = new ArrayList<>(TIER_0.size() + TIER_1.size() + TIER_2.size() + TIER_3.size() + TIER_4.size());
+
+        SUPPORTED.addAll(TIER_0);
+        SUPPORTED.addAll(TIER_1);
+        SUPPORTED.addAll(TIER_2);
+        SUPPORTED.addAll(TIER_3);
+        SUPPORTED.addAll(TIER_4);
+
+        return SUPPORTED;
     }
 
     public int requiredTierFor(EntityType<?> entity) {
@@ -119,6 +140,24 @@ public class EntityTiers {
 
     public boolean anySupports(EntityType<?> entity) {
         return tier4Supports(entity);
+    }
+
+    public void fromUpdatePacket(PacketByteBuf buf) {
+        UNSUPPORTED.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
+        TIER_0.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
+        TIER_1.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
+        TIER_2.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
+        TIER_3.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
+        TIER_4.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
+    }
+
+    public void toUpdatePacket(PacketByteBuf buf) {
+        buf.writeCollection(UNSUPPORTED, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
+        buf.writeCollection(TIER_0, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
+        buf.writeCollection(TIER_1, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
+        buf.writeCollection(TIER_2, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
+        buf.writeCollection(TIER_3, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
+        buf.writeCollection(TIER_4, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
     }
 
     @Override

@@ -20,4 +20,6 @@ public final class ModPackets {
     public static final Identifier GUI_UPDATE_ATTACK_DAMAGE    = id("gui_update_attack_damage");
 
     public static final Identifier GUI_DISPLAY_PROBLEM_MESSAGE = id("gui_display_problem_message");
+
+    public static final Identifier UPDATE_ENTITY_TIER_LIST     = id("update_entity_tier_list");
 }
