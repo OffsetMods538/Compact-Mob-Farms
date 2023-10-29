@@ -15,6 +15,7 @@ public final class ModBlockEntityTypes {
 
     public static final BlockEntityType<CompactMobFarmBlockEntity> COMPACT_MOB_FARM = register(FabricBlockEntityTypeBuilder.create(CompactMobFarmBlockEntity::new, ModBlocks.COMPACT_MOB_FARM).build(), "compact_mob_farm");
 
+    @SuppressWarnings("SameParameterValue")
     private static <T extends BlockEntityType<?>> T register(T block, String name) {
         return Registry.register(Registries.BLOCK_ENTITY_TYPE, id(name), block);
     }

@@ -149,7 +149,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         super(ModBlockEntityTypes.COMPACT_MOB_FARM, pos, state);
     }
 
-    public static void tick(World world, BlockPos pos, BlockState state, CompactMobFarmBlockEntity blockEntity) {
+    public static void tick(World world, CompactMobFarmBlockEntity blockEntity) {
         if (world.isClient()) return;
 
         // Set entity if it doesn't exist
@@ -193,6 +193,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         setCurrentEntityHealth(maxEntityHealth);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean setCurrentEntity() {
         final ItemStack sampleTaker = this.getSampleTaker();
         if (sampleTaker == null) return false;
@@ -373,11 +374,6 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
             dropInventory.insert(ItemVariant.of(NUGGET_OF_EXPERIENCE), amount / 3, transaction);
             transaction.commit();
         }
-    }
-
-    @Override
-    public void markDirty() {
-        super.markDirty();
     }
 
     public ItemStack getSampleTaker() {

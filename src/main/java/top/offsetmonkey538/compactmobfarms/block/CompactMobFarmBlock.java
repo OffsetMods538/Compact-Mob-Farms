@@ -97,14 +97,16 @@ public class CompactMobFarmBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, ModBlockEntityTypes.COMPACT_MOB_FARM, CompactMobFarmBlockEntity::tick);
+        return checkType(type, ModBlockEntityTypes.COMPACT_MOB_FARM, (world1, pos, state1, blockEntity) -> CompactMobFarmBlockEntity.tick(world1, blockEntity));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public BlockState rotate(BlockState state, BlockRotation rotation) {
         return state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public BlockState mirror(BlockState state, BlockMirror mirror) {
         return state.rotate(mirror.getRotation(state.get(FACING)));

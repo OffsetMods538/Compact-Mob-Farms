@@ -14,6 +14,7 @@ public final class ModRecipes {
 
     public static final SpecialRecipeSerializer<FilledSampleTakerCloningRecipe> CLONE_FILLED_SAMPLE_TAKER = register("clone_filled_sample_taker", new SpecialRecipeSerializer<>(FilledSampleTakerCloningRecipe::new));
 
+    @SuppressWarnings("SameParameterValue")
     private static <T extends RecipeSerializer<?>> T register(String name, T item) {
         return Registry.register(Registries.RECIPE_SERIALIZER, id(name), item);
     }

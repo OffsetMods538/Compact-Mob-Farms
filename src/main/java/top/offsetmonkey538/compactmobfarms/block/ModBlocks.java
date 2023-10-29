@@ -17,6 +17,7 @@ public final class ModBlocks {
 
     public static final Block COMPACT_MOB_FARM = register(new CompactMobFarmBlock(FabricBlockSettings.create().mapColor(MapColor.IRON_GRAY).instrument(Instrument.IRON_XYLOPHONE).sounds(BlockSoundGroup.METAL).strength(50.0f, 1200.0f).nonOpaque().notSolid().requiresTool()), "compact_mob_farm");
 
+    @SuppressWarnings("SameParameterValue")
     private static <T extends Block> T register(T block, String name) {
         return Registry.register(Registries.BLOCK, id(name), block);
     }

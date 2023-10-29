@@ -15,6 +15,7 @@ public final class ModScreenHandlers {
 
     public static final ScreenHandlerType<CompactMobFarmScreenHandler> COMPACT_MOB_FARM_SCREEN_HANDLER = register(CompactMobFarmScreenHandler::new, "sample_taker");
 
+    @SuppressWarnings("SameParameterValue")
     private static <T extends ScreenHandler> ScreenHandlerType<T> register(ExtendedScreenHandlerType.ExtendedFactory<T> factory, String name) {
         return Registry.register(Registries.SCREEN_HANDLER, id(name), new ExtendedScreenHandlerType<>(factory));
     }
