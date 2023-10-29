@@ -12,6 +12,8 @@ public class ModEnglishLanguageProvider extends FabricLanguageProvider {
 
     @Override
     public void generateTranslations(TranslationBuilder translationBuilder) {
+        translationBuilder.add("emi_info.compact_mob_farms.sampling", "Use a sample taker on a(n) %s 10 times.");
+
         translationBuilder.add("itemGroup.compact_mob_farms.main_group", "Compact Mob Farms");
         translationBuilder.add("itemGroup.compact_mob_farms.filled_sample_takers_group", "Sample Takers");
 

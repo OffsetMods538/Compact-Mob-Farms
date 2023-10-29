@@ -29,7 +29,7 @@
 			"com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
 		],
 		"emi": [
-			"top.offsetmonkey538.compactmobfarms.emi.CompactMobFarmsEmiPlugin"
+            "top.offsetmonkey538.compactmobfarms.client.emi.CompactMobFarmsEmiPlugin"
 		]
 	},
 	"mixins": [

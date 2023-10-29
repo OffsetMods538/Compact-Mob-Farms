@@ -12,6 +12,8 @@ public class ModEstonianLanguageProvider extends FabricLanguageProvider {
 
     @Override
     public void generateTranslations(TranslationBuilder translationBuilder) {
+        translationBuilder.add("emi_info.compact_mob_farms.sampling", "Kasuta proovivõtjat olendi \"%s\" peal 10 korda.");
+
         translationBuilder.add("itemGroup.compact_mob_farms.main_group", "Kompaktsed Olendi Farmid");
         translationBuilder.add("itemGroup.compact_mob_farms.filled_sample_takers_group", "Proovivõtjad");
 
