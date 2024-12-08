@@ -25,9 +25,6 @@
 		"fabric-datagen": [
 			"top.offsetmonkey538.compactmobfarms.datagen.CompactMobFarmsDatagen"
 		],
-		"preLaunch": [
-			"com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
-		],
 		"emi": [
             "top.offsetmonkey538.compactmobfarms.client.emi.CompactMobFarmsEmiPlugin"
 		]

@@ -66,7 +66,6 @@ repositories {
 		name = "JitPack"
 		url  = "https://jitpack.io"
 		content {
-			includeGroup "com.github.llamalad7.mixinextras"
 			includeGroup "top.offsetmonkey538"
 		}
 	}
@@ -89,9 +88,6 @@ dependencies {
 
 	// Uncomment for including a module of fabric api
 	// includeModImplementation fabricApi.module("fabric-api-base", outlet.fapiVersion(project.minecraft_version))
-
-	// Mixin Extras
-	includeImplementation annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-fabric:${project.mixinextras_version}")
 
 	// Config library
 	includeModImplementation "top.offsetmonkey538:monkeyconfig538:${project.monkeyconfig538_version}"
