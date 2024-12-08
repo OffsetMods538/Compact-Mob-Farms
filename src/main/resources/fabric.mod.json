@@ -25,9 +25,6 @@
 		"fabric-datagen": [
 			"top.offsetmonkey538.compactmobfarms.datagen.CompactMobFarmsDatagen"
 		],
-		"preLaunch": [
-			"com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
-		],
 		"emi": [
             "top.offsetmonkey538.compactmobfarms.client.emi.CompactMobFarmsEmiPlugin"
 		]
@@ -41,8 +38,9 @@
 	],
 	"accessWidener": "compact-mob-farms.accesswidener",
 	"depends": {
-		"fabric-api": "*",
-		"minecraft": "${supportedMinecraftVersions}"
+		"minecraft": "${supportedMinecraftVersions}",
+		"fabric-api": ">=${fapi_version}",
+		"monkeylib538": "${monkeylib538_version}"
 	},
 	"suggests": {
 		"create": ">=0.4",
