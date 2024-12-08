@@ -38,8 +38,8 @@
 	],
 	"accessWidener": "compact-mob-farms.accesswidener",
 	"depends": {
+		"fabric-api": "*",
 		"minecraft": "${supportedMinecraftVersions}",
-		"fabric-api": ">=${fapi_version}",
 		"monkeylib538": "${monkeylib538_version}"
 	},
 	"suggests": {
