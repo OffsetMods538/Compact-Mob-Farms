@@ -1,6 +1,5 @@
 package top.offsetmonkey538.compactmobfarms.item;
 
-import java.util.List;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
@@ -10,6 +9,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
+
+import java.util.List;
 
 public class FilledSampleTakerItem extends Item {
     public static final String SAMPLED_ENTITY_KEY = "SampledEntity";
@@ -34,7 +36,7 @@ public class FilledSampleTakerItem extends Item {
     @Nullable
     public static Identifier getSampledEntityId(ItemStack stack) {
         if (stack.getNbt() == null || !stack.getNbt().contains(SAMPLED_ENTITY_KEY)) return null;
-        return new Identifier(stack.getNbt().getString(SAMPLED_ENTITY_KEY));
+        return IdentifierUtils.INSTANCE.of(stack.getNbt().getString(SAMPLED_ENTITY_KEY));
     }
 
     @Nullable

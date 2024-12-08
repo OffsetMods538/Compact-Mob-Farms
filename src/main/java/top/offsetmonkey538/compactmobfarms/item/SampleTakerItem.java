@@ -1,8 +1,5 @@
 package top.offsetmonkey538.compactmobfarms.item;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -21,6 +18,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
+import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class SampleTakerItem extends Item {
     public static final String SAMPLED_ENTITY_KEY = "SampledEntity";
@@ -98,7 +100,7 @@ public class SampleTakerItem extends Item {
     @Nullable
     public static Identifier getSampledEntityId(ItemStack stack) {
         if (stack.getNbt() == null || !stack.getNbt().contains(SAMPLED_ENTITY_KEY)) return null;
-        return new Identifier(stack.getNbt().getString(SAMPLED_ENTITY_KEY));
+        return IdentifierUtils.INSTANCE.of(stack.getNbt().getString(SAMPLED_ENTITY_KEY));
     }
 
     @Nullable

@@ -1,8 +1,5 @@
 package top.offsetmonkey538.compactmobfarms.block.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiConsumer;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -49,6 +46,11 @@ import top.offsetmonkey538.compactmobfarms.item.FilledSampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.screen.CompactMobFarmScreenHandler;
+import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
     public static final String DROP_INVENTORY_NBT_KEY = "DropInventory";
@@ -59,7 +61,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     public static final String TURNED_ON_NBT_KEY = "IsTurnedOn";
 
     public static final int DEFAULT_ATTACK_SPEED = 30 * 20; // 30 seconds, multiplied by 20 because it needs to be in ticks.
-    public static final Item NUGGET_OF_EXPERIENCE = Registries.ITEM.get(new Identifier("create:experience_nugget"));
+    public static final Item NUGGET_OF_EXPERIENCE = Registries.ITEM.get(IdentifierUtils.INSTANCE.of("create:experience_nugget"));
 
     private int killTimer = 0;
     private boolean isTurnedOn = true;

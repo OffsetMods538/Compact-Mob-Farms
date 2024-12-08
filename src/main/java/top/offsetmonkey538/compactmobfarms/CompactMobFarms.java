@@ -28,6 +28,7 @@ import top.offsetmonkey538.compactmobfarms.item.group.ModItemGroups;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.recipe.ModRecipes;
 import top.offsetmonkey538.compactmobfarms.screen.ModScreenHandlers;
+import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
 
 public class CompactMobFarms implements ModInitializer {
 	public static final String MOD_ID = "compact-mob-farms";
@@ -68,6 +69,6 @@ public class CompactMobFarms implements ModInitializer {
 	}
 
 	public static Identifier id(String path) {
-		return new Identifier(MOD_ID, path);
+		return IdentifierUtils.INSTANCE.of(MOD_ID, path);
 	}
 }

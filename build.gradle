@@ -63,10 +63,10 @@ configurations {
 repositories {
 	mavenCentral()
 	maven {
-		name = "JitPack"
-		url  = "https://jitpack.io"
+		name = "OffsetMods538"
+		url  = "https://maven.offsetmonkey538.top/releases"
 		content {
-			includeGroup "top.offsetmonkey538"
+			includeGroup "top.offsetmonkey538.monkeylib538"
 		}
 	}
 	maven {
@@ -89,8 +89,8 @@ dependencies {
 	// Uncomment for including a module of fabric api
 	// includeModImplementation fabricApi.module("fabric-api-base", outlet.fapiVersion(project.minecraft_version))
 
-	// Config library
-	includeModImplementation "top.offsetmonkey538:monkeyconfig538:${project.monkeyconfig538_version}"
+	// MonkeyLib538
+	modImplementation "top.offsetmonkey538.monkeylib538:monkeylib538:${project.monkeylib538_version}"
 
 	// EMI
 	modCompileOnly  "dev.emi:emi-fabric:${project.emi_version}:api"
