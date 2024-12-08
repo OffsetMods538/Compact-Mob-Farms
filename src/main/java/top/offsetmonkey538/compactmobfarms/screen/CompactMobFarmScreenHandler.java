@@ -21,6 +21,7 @@ import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
 import top.offsetmonkey538.compactmobfarms.item.FilledSampleTakerItem;
+import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.TierUpgradeItem;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
@@ -86,7 +87,6 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
             }
         });
 
-        this.addSlot(new Slot(sword, 0, 89, 16));
         this.addSlot(new Slot(tierUpgrade, 0, 12, 53) {
             @Override
             public boolean canInsert(ItemStack stack) {
@@ -125,6 +125,11 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
             });
         }
 
+        // The sword slot should be the last
+        //  farm slot because we want it to be
+        //  tried last when quick moving items.
+        this.addSlot(new Slot(sword, 0, 89, 16));
+
 
         // The player inventory
         for (int y = 0; y < 3; ++y) {
@@ -140,21 +145,47 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int slotId) {
-        // fixme: it don't do the worky
-
         final Slot slot = this.getSlot(slotId);
-
         final ItemStack originalStack = slot.getStack();
-        ItemStack newStack = originalStack.copy();
 
-        if (slotId < 2 && !this.insertItem(originalStack, 1, this.slots.size(), true)) newStack = ItemStack.EMPTY;
-        if (!this.insertItem(originalStack, 0, 1, false)) newStack = ItemStack.EMPTY;
+        if (slot.inventory instanceof PlayerInventory) {
+            if (originalStack.isOf(ModItems.FILLED_SAMPLE_TAKER)) return tryInsertInSlot(originalStack, 0);
+            if (originalStack.getItem() instanceof TierUpgradeItem) return tryInsertInSlot(originalStack, 1);
+            if (originalStack.getItem() instanceof CompactMobFarmUpgradeItem) return tryInsertInSlots(originalStack, 2, 5);
 
-        if (originalStack.isEmpty()) slot.setStack(ItemStack.EMPTY);
+            return tryInsertInSlot(originalStack, 6);
+        }
 
-        slot.markDirty();
+        return tryInsertInSlots(originalStack, 7, 42);
+    }
 
-        return newStack;
+    private ItemStack tryInsertInSlot(ItemStack stackToInsert, int slotId) {
+        final Slot insertionSlot = this.getSlot(slotId);
+        final ItemStack existingStack = insertionSlot.getStack();
+        if (existingStack.getCount() < insertionSlot.getMaxItemCount() && insertionSlot.canInsert(stackToInsert)) {
+            if (stackToInsert.getCount() > insertionSlot.getMaxItemCount()) {
+                insertionSlot.setStack(stackToInsert.split(insertionSlot.getMaxItemCount()));
+            } else {
+                insertionSlot.setStack(stackToInsert.split(stackToInsert.getCount()));
+            }
+            insertionSlot.markDirty();
+            return stackToInsert;
+        }
+
+        return ItemStack.EMPTY;
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private ItemStack tryInsertInSlots(ItemStack stackToInsert, int startSlotId, int endSlotId) {
+        for (int insertionSlotId = startSlotId; insertionSlotId <= endSlotId; insertionSlotId++) {
+            ItemStack newStack = tryInsertInSlot(stackToInsert, insertionSlotId);
+
+            if (newStack.isEmpty()) continue;
+
+            return newStack;
+        }
+
+        return ItemStack.EMPTY;
     }
 
     @Override
