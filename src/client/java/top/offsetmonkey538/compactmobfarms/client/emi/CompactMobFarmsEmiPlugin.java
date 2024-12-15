@@ -45,6 +45,6 @@ public class CompactMobFarmsEmiPlugin implements EmiPlugin {
             ));
         }
 
-        registry.setDefaultComparison(ModItems.FILLED_SAMPLE_TAKER, Comparison.compareNbt());
+        registry.setDefaultComparison(ModItems.FILLED_SAMPLE_TAKER, Comparison.compareComponents());
     }
 }

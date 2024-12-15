@@ -2,16 +2,19 @@ package top.offsetmonkey538.compactmobfarms.datagen.language;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
+import net.minecraft.registry.RegistryWrapper;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 
+import java.util.concurrent.CompletableFuture;
+
 public class ModEnglishLanguageProvider extends FabricLanguageProvider {
-    public ModEnglishLanguageProvider(FabricDataOutput dataOutput) {
-        super(dataOutput);
+    public ModEnglishLanguageProvider(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
+        super(dataOutput, registryLookup);
     }
 
     @Override
-    public void generateTranslations(TranslationBuilder translationBuilder) {
+    public void generateTranslations(RegistryWrapper.WrapperLookup registryLookup, TranslationBuilder translationBuilder) {
         translationBuilder.add("emi_info.compact_mob_farms.sampling", "Use a sample taker on a(n) %s 10 times.");
 
         translationBuilder.add("itemGroup.compact_mob_farms.main_group", "Compact Mob Farms");

@@ -17,8 +17,8 @@ import top.offsetmonkey538.compactmobfarms.item.ModItems;
 @Mixin(SpawnerBlock.class)
 public abstract class SpawnerBlockMixin extends AbstractBlockMixin {
     @Override
-    protected void compact_mob_farms$obtainSpiritBottleFromSpawner(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
-        final ItemStack item = player.getStackInHand(hand);
+    protected void compact_mob_farms$obtainSpiritBottleFromSpawner(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
+        final ItemStack item = player.getStackInHand(Hand.MAIN_HAND);
 
         if (!item.isOf(Items.GLASS_BOTTLE)) {
             cir.setReturnValue(ActionResult.PASS);
@@ -26,7 +26,9 @@ public abstract class SpawnerBlockMixin extends AbstractBlockMixin {
         }
 
         if (!player.getAbilities().creativeMode) item.decrement(1);
-        player.giveItemStack(ModItems.SPIRIT_BOTTLE.getDefaultStack());
+        if (!player.giveItemStack(ModItems.SPIRIT_BOTTLE.getDefaultStack())) {
+            player.dropItem(ModItems.SPIRIT_BOTTLE.getDefaultStack(), true);
+        }
 
         cir.setReturnValue(ActionResult.success(world.isClient()));
     }

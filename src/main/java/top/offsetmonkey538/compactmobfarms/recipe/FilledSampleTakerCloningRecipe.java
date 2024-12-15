@@ -5,25 +5,27 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
 
 public class FilledSampleTakerCloningRecipe extends SpecialCraftingRecipe {
-    public FilledSampleTakerCloningRecipe(Identifier id, CraftingRecipeCategory category) {
-        super(id, category);
+    public FilledSampleTakerCloningRecipe(CraftingRecipeCategory category) {
+        super(category);
     }
 
     @Override
-    public boolean matches(RecipeInputInventory inventory, World world) {
+    public boolean matches(CraftingRecipeInput input, World world) {
         boolean foundFilledSampleTaker = false;
         boolean foundEmptySampleTaker = false;
         boolean foundSpiritBottle = false;
 
-        for (int i = 0; i < inventory.getInputStacks().size(); i++) {
-            final ItemStack stack = inventory.getInputStacks().get(i);
+        for (int i = 0; i < input.getStacks().size(); i++) {
+            final ItemStack stack = input.getStacks().get(i);
             if (stack.isEmpty()) continue;
 
             if (stack.isOf(ModItems.FILLED_SAMPLE_TAKER)) {
@@ -32,7 +34,7 @@ public class FilledSampleTakerCloningRecipe extends SpecialCraftingRecipe {
             }
 
             if (stack.isOf(ModItems.SAMPLE_TAKER)) {
-                if (SampleTakerItem.getSamplesCollected(stack).size() > 0) return false;
+                if (!SampleTakerItem.getSamplesCollected(stack).isEmpty()) return false;
 
                 if (foundEmptySampleTaker) return false;
                 foundEmptySampleTaker = true;
@@ -50,10 +52,10 @@ public class FilledSampleTakerCloningRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, DynamicRegistryManager registryManager) {
-        final ItemStack filledSampleTaker = inventory.getInputStacks().stream()
+    public ItemStack craft(CraftingRecipeInput input, RegistryWrapper.WrapperLookup lookup) {
+        final ItemStack filledSampleTaker = input.getStacks().stream()
                 .filter(stack -> stack.isOf(ModItems.FILLED_SAMPLE_TAKER))
-                .toList().get(0);
+                .toList().getFirst();
 
         return filledSampleTaker.copyWithCount(2);
     }

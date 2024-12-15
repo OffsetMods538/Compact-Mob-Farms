@@ -4,14 +4,19 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.client.render.debug.DebugRenderer;
+import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.ColorHelper;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.ModBlockEntityTypes;
 import top.offsetmonkey538.compactmobfarms.client.gui.screen.ingame.CompactMobFarmScreen;
@@ -41,87 +46,79 @@ public class CompactMobFarmsClient implements ClientModInitializer {
 
 			if (spawnEgg == null) return -1;
 
-			return spawnEgg.getColor(tintIndex);
+			return ColorHelper.Argb.fullAlpha(spawnEgg.getColor(tintIndex));
 		}, ModItems.FILLED_SAMPLE_TAKER);
 
-		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_ENTITY_CHANGED, (client, handler, buf, responseSender) -> {
-			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GuiEntityChanged.ID, (payload, context) -> {
+			// IntelliJ thinks I should run '.close()' on the MinecraftClient and close the game as it inherits
+			//  from AutoCloseable. Mr. IntelliJ IDEA is totally right.
+			//  noinspection resource
+            if (!(context.client().currentScreen instanceof CompactMobFarmScreen screen)) return;
+			if (screen.getScreenHandler().syncId != payload.syncId()) return;
 
-			EntityType<?> livingEntityType = buf.readRegistryValue(Registries.ENTITY_TYPE);
-
-			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
-
-			screen.setEntity(livingEntityType);
+			screen.setEntity(payload.newEntity().orElse(null));
 		});
 
-		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_ENTITY_REMOVED, (client, handler, buf, responseSender) -> {
-			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
-			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GuiHealthChanged.ID, (payload, context) -> {
+			// IntelliJ thinks I should run '.close()' on the MinecraftClient and close the game as it inherits
+			//  from AutoCloseable. Mr. IntelliJ IDEA is totally right.
+			//  noinspection resource
+			if (!(context.client().currentScreen instanceof CompactMobFarmScreen screen)) return;
+			if (screen.getScreenHandler().syncId != payload.syncId()) return;
 
-			screen.clearEntity();
+			if (payload.newHealth().isEmpty()) screen.resetEntityHealth();
+			else screen.setEntityHealth(payload.newHealth().get());
 		});
 
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GuiMaxHealthChanged.ID, (payload, context) -> {
+			// IntelliJ thinks I should run '.close()' on the MinecraftClient and close the game as it inherits
+			//  from AutoCloseable. Mr. IntelliJ IDEA is totally right.
+			//  noinspection resource
+			if (!(context.client().currentScreen instanceof CompactMobFarmScreen screen)) return;
+			if (screen.getScreenHandler().syncId != payload.syncId()) return;
 
-		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_HEALTH_RESET, (client, handler, buf, responseSender) -> {
-			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
-			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
-
-			screen.resetEntityHealth();
+			screen.setMaxEntityHealth(payload.newMaxHealth());
 		});
 
-		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_HEALTH_CHANGED, (client, handler, buf, responseSender) -> {
-			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GuiAttackSpeedChanged.ID, (payload, context) -> {
+			// IntelliJ thinks I should run '.close()' on the MinecraftClient and close the game as it inherits
+			//  from AutoCloseable. Mr. IntelliJ IDEA is totally right.
+			//  noinspection resource
+			if (!(context.client().currentScreen instanceof CompactMobFarmScreen screen)) return;
+			if (screen.getScreenHandler().syncId != payload.syncId()) return;
 
-			float newHealth = buf.readFloat();
-
-			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
-
-			screen.setEntityHealth(newHealth);
+			screen.setAttackSpeed(payload.newAttackSpeed());
 		});
 
-		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_MAX_HEALTH_CHANGED, (client, handler, buf, responseSender) -> {
-			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GuiAttackDamageChanged.ID, (payload, context) -> {
+			// IntelliJ thinks I should run '.close()' on the MinecraftClient and close the game as it inherits
+			//  from AutoCloseable. Mr. IntelliJ IDEA is totally right.
+			//  noinspection resource
+			if (!(context.client().currentScreen instanceof CompactMobFarmScreen screen)) return;
+			if (screen.getScreenHandler().syncId != payload.syncId()) return;
 
-			float newMaxHealth = buf.readFloat();
-
-			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
-
-			screen.setMaxEntityHealth(newMaxHealth);
+			screen.setAttackDamage(payload.newAttackDamage());
 		});
 
-		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_UPDATE_ATTACK_SPEED, (client, handler, buf, responseSender) -> {
-			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GuiDisplayProblemMessage.ID, (payload, context) -> {
+			// IntelliJ thinks I should run '.close()' on the MinecraftClient and close the game as it inherits
+			//  from AutoCloseable. Mr. IntelliJ IDEA is totally right.
+			//  noinspection resource
+			if (!(context.client().currentScreen instanceof CompactMobFarmScreen screen)) return;
+			if (screen.getScreenHandler().syncId != payload.syncId()) return;
 
-			float newAttackSpeed = buf.readFloat();
-
-			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
-
-			screen.setAttackSpeed(newAttackSpeed);
+			screen.displayProblemMessage(payload.problemMessage());
 		});
 
-		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_UPDATE_ATTACK_DAMAGE, (client, handler, buf, responseSender) -> {
-			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
-
-			float newAttackDamage = buf.readFloat();
-
-			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
-
-			screen.setAttackDamage(newAttackDamage);
-		});
-
-		ClientPlayNetworking.registerGlobalReceiver(ModPackets.GUI_DISPLAY_PROBLEM_MESSAGE, (client, handler, buf, responseSender) -> {
-			if (!(client.currentScreen instanceof CompactMobFarmScreen screen)) return;
-
-			Text problemMessage = buf.readText();
-
-			if (screen.getScreenHandler().syncId != buf.readUnsignedByte()) return;
-
-			screen.displayProblemMessage(problemMessage);
-		});
-
-		ClientPlayNetworking.registerGlobalReceiver(ModPackets.UPDATE_ENTITY_TIER_LIST, (client, handler, buf, responseSender) -> {
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.EntityTierListChanged.ID, (payload, context) -> {
 			EntityTiers.INSTANCE.clear();
-			EntityTiers.INSTANCE.fromUpdatePacket(buf);
+
+			EntityTiers.INSTANCE.UNSUPPORTED = payload.unsupported();
+			EntityTiers.INSTANCE.TIER_0 = payload.tier0();
+			EntityTiers.INSTANCE.TIER_1 = payload.tier1();
+			EntityTiers.INSTANCE.TIER_2 = payload.tier2();
+			EntityTiers.INSTANCE.TIER_3 = payload.tier3();
+			EntityTiers.INSTANCE.TIER_4 = payload.tier4();
 		});
 	}
 }

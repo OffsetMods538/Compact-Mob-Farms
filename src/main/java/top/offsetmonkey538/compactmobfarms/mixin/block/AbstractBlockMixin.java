@@ -22,7 +22,7 @@ public abstract class AbstractBlockMixin {
             cancellable = true
     )
     @SuppressWarnings("CancellableInjectionUsage")
-    protected void compact_mob_farms$obtainSpiritBottleFromSpawner(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
+    protected void compact_mob_farms$obtainSpiritBottleFromSpawner(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
         // Implemented in SpawnerBlockMixin
     }
 }
