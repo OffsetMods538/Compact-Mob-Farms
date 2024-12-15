@@ -1,20 +1,21 @@
 package top.offsetmonkey538.compactmobfarms.block.entity;
 
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifierSlot;
+import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -24,23 +25,26 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.accessor.EntityAccessor;
 import top.offsetmonkey538.compactmobfarms.accessor.LivingEntityAccessor;
+import top.offsetmonkey538.compactmobfarms.component.ModComponents;
 import top.offsetmonkey538.compactmobfarms.inventory.CompactMobFarmInventory;
 import top.offsetmonkey538.compactmobfarms.item.FilledSampleTakerItem;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
@@ -50,9 +54,11 @@ import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
-public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
+public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory<CompactMobFarmScreenHandler.OpeningData> {
     public static final String DROP_INVENTORY_NBT_KEY = "DropInventory";
     public static final String SAMPLE_TAKER_NBT_KEY = "SampleTaker";
     public static final String TIER_UPGRADE_NBT_KEY = "TierUpgrade";
@@ -68,7 +74,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     private float maxEntityHealth = -1;
     private float currentEntityHealth = -1;
     private LivingEntity currentEntity = null;
-    private final List<BiConsumer<Identifier, PacketByteBuf>> packetSenders = new ArrayList<>();
+    private final List<Consumer< CustomPayload>> packetSenders = new ArrayList<>();
     private final CompactMobFarmInventory dropInventory = new CompactMobFarmInventory();
     private final SimpleInventory tierUpgrade = new SimpleInventory(1) {
         @Override
@@ -81,7 +87,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
             return false;
         }
     };
-    private final SimpleInventory upgrades = new SimpleInventory(4) {
+    private final UpgradesInventory upgrades = new UpgradesInventory(4) {
         @Override
         public int getMaxCountPerStack() {
             return 1;
@@ -122,11 +128,12 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
             CompactMobFarmBlockEntity.this.currentEntity = null;
 
             CompactMobFarmBlockEntity.this.resetHealth();
+            CompactMobFarmBlockEntity.this.sendAttackDamageUpgradePacket();
 
             if (CompactMobFarmBlockEntity.this.world == null) return;
             CompactMobFarmBlockEntity.this.world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_LISTENERS);
         }
-    };
+    };;
     private final SimpleInventory sword = new SimpleInventory(1) {
         @Override
         public int getMaxCountPerStack() {
@@ -180,8 +187,8 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         final FakePlayer player = FakePlayer.get(serverWorld);
         if (this.getSword() != null) {
             player.setStackInHand(Hand.MAIN_HAND, this.getSword());
-            if(EnchantmentHelper.getFireAspect(player) > 0) currentEntity.setFireTicks(1);
-            if (this.getSword().damage(1, world.random, null)) this.sword.clear();
+            if(EnchantmentHelper.getLevel(serverWorld.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(Enchantments.FIRE_ASPECT).orElseThrow(), getSword()) > 0) currentEntity.setFireTicks(1);
+            this.getSword().damage(1, serverWorld, player, item -> this.sword.clear());
         }
 
         float attackDamage = getAttackDamage(this.getSword(), currentEntity);
@@ -208,57 +215,42 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         if (!(entity instanceof LivingEntity livingEntity)) return false;
 
         this.currentEntity = livingEntity;
+
+        CompactMobFarmBlockEntity.this.sendAttackDamageUpgradePacket();
+
         return true;
     }
 
     private void sendEntityUpdatePacket(EntityType<?> newEntity) {
-        if (newEntity == null) {
-            sendPacket(ModPackets.GUI_ENTITY_REMOVED, PacketByteBufs.create());
-            return;
-        }
-
-
-        PacketByteBuf buf = PacketByteBufs.create();
-
-        buf.writeRegistryValue(Registries.ENTITY_TYPE, newEntity);
-
-        sendPacket(ModPackets.GUI_ENTITY_CHANGED, buf);
+        sendPacket(new ModPackets.GuiEntityChanged(newEntity));
     }
 
     private void sendAttackSpeedUpgradePacket() {
-        PacketByteBuf buf = PacketByteBufs.create();
-
-        buf.writeFloat(getAttackSpeed(getSword(), currentEntity));
-
-        sendPacket(ModPackets.GUI_UPDATE_ATTACK_SPEED, buf);
+        sendPacket(new ModPackets.GuiAttackSpeedChanged(getAttackSpeed(getSword(), currentEntity)));
     }
 
     private void sendAttackDamageUpgradePacket() {
-        PacketByteBuf buf = PacketByteBufs.create();
-
-        buf.writeFloat(getAttackDamage(getSword(), currentEntity));
-
-        sendPacket(ModPackets.GUI_UPDATE_ATTACK_DAMAGE, buf);
+        sendPacket(new ModPackets.GuiAttackDamageChanged(getAttackDamage(getSword(), currentEntity)));
     }
 
-    public void sendPacket(Identifier packet, PacketByteBuf buf) {
-        for (BiConsumer<Identifier, PacketByteBuf> sender : packetSenders) {
-            sender.accept(packet, buf);
+    public void sendPacket(CustomPayload payload) {
+        for (Consumer<CustomPayload> sender : packetSenders) {
+            sender.accept(payload);
         }
     }
 
-    public void registerPacketSender(BiConsumer<Identifier, PacketByteBuf> sender) {
+    public void registerPacketSender(Consumer<CustomPayload> sender) {
         this.packetSenders.add(sender);
     }
 
-    public void removePacketSender(BiConsumer<Identifier, PacketByteBuf> sender) {
+    public void removePacketSender(Consumer<CustomPayload> sender) {
         this.packetSenders.remove(sender);
     }
 
     private int getAttackSpeed(@Nullable ItemStack sword, LivingEntity target) {
         int result = DEFAULT_ATTACK_SPEED;
 
-        for (ItemStack upgradeStack : upgrades.stacks) {
+        for (ItemStack upgradeStack : upgrades.heldStacks) {
             if (!(upgradeStack.getItem() instanceof CompactMobFarmUpgradeItem upgrade)) continue;
 
             result = upgrade.modifyAttackSpeed(result, sword, target, this);
@@ -268,26 +260,32 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     }
 
     private float getAttackDamage(@Nullable ItemStack sword, LivingEntity target) {
-        float result = 1;
+        AtomicReference<Float> result = new AtomicReference<>((float) 1);
 
 
-        if (sword != null && target != null) {
-            result += EnchantmentHelper.getAttackDamage(sword, target.getGroup());
-            result += sword.getAttributeModifiers(EquipmentSlot.MAINHAND).get(EntityAttributes.GENERIC_ATTACK_DAMAGE).stream()
-                    .mapToDouble(EntityAttributeModifier::getValue).sum();
+        if (sword != null && target != null && world instanceof ServerWorld serverWorld) {
+            final FakePlayer player = FakePlayer.get(serverWorld);
+            player.setStackInHand(Hand.MAIN_HAND, sword);
+
+            result.updateAndGet(v -> v + EnchantmentHelper.getDamage(serverWorld, sword, target, serverWorld.getDamageSources().playerAttack(player), 0));
+            sword.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT).applyModifiers(AttributeModifierSlot.MAINHAND, (attribute, modifier) -> {
+                if (attribute != EntityAttributes.GENERIC_ATTACK_DAMAGE) return;
+                result.updateAndGet(v -> (float) (v + modifier.value()));
+            });
         }
 
-        for (ItemStack upgradeStack : upgrades.stacks) {
+        for (ItemStack upgradeStack : upgrades.heldStacks) {
             if (!(upgradeStack.getItem() instanceof CompactMobFarmUpgradeItem upgrade)) continue;
 
-            result = upgrade.modifyAttackDamage(result, sword, target, this);
+            result.set(upgrade.modifyAttackDamage(result.get(), sword, target, this));
         }
 
-        return result;
+        return result.get();
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private void killEntity(PlayerEntity player) {
+        if (!(world instanceof ServerWorld serverWorld)) return;
+
         ((EntityAccessor) currentEntity).compact_mob_farms$setDropMethod(stack -> {
             try (Transaction transaction = Transaction.openOuter()) {
                 dropInventory.insert(ItemVariant.of(stack), stack.getCount(), transaction);
@@ -300,7 +298,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         currentEntity.setAttacker(player);
         currentEntity.setAttacking(player);
 
-        currentEntity.drop(currentEntity.getDamageSources().playerAttack(player));
+        currentEntity.drop(serverWorld, currentEntity.getDamageSources().playerAttack(player));
     }
 
 
@@ -316,38 +314,76 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     }
 
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        buf.writeBoolean(isTurnedOn);
-        buf.writeFloat(currentEntityHealth);
-        buf.writeFloat(maxEntityHealth);
-        buf.writeFloat(getAttackSpeed(getSword(), currentEntity));
-        buf.writeFloat(getAttackDamage(getSword(), currentEntity));
-        buf.writeBoolean(currentEntity != null);
-        if (currentEntity != null) buf.writeRegistryValue(Registries.ENTITY_TYPE, currentEntity.getType());
+    public CompactMobFarmScreenHandler.OpeningData getScreenOpeningData(ServerPlayerEntity player) {
+        return new CompactMobFarmScreenHandler.OpeningData(
+                isTurnedOn,
+                currentEntityHealth,
+                maxEntityHealth,
+                getAttackSpeed(getSword(), currentEntity),
+                getAttackDamage(getSword(), currentEntity),
+                Optional.ofNullable(currentEntity == null ? null : currentEntity.getType())
+        );
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        nbt.put(DROP_INVENTORY_NBT_KEY, dropInventory.toNbtList());
-        nbt.put(SAMPLE_TAKER_NBT_KEY, sampleTaker.toNbtList());
-        nbt.put(TIER_UPGRADE_NBT_KEY, tierUpgrade.toNbtList());
-        nbt.put(UPGRADES_NBT_KEY, upgrades.toNbtList());
-        nbt.put(SWORD_NBT_KEY, sword.toNbtList());
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+
+        dropInventory.fromNbt(nbt.getList(DROP_INVENTORY_NBT_KEY, NbtElement.COMPOUND_TYPE), registryLookup);
+        sampleTaker.readNbtList(nbt.getList(SAMPLE_TAKER_NBT_KEY, NbtElement.COMPOUND_TYPE), registryLookup);
+        tierUpgrade.readNbtList(nbt.getList(TIER_UPGRADE_NBT_KEY, NbtElement.COMPOUND_TYPE), registryLookup);
+        upgrades.readNbtList(nbt.getList(UPGRADES_NBT_KEY, NbtElement.COMPOUND_TYPE), registryLookup);
+        sword.readNbtList(nbt.getList(SWORD_NBT_KEY, NbtElement.COMPOUND_TYPE), registryLookup);
+        isTurnedOn = nbt.getBoolean(TURNED_ON_NBT_KEY);
+    }
+
+    @Override
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        nbt.put(DROP_INVENTORY_NBT_KEY, dropInventory.toNbtList(registryLookup));
+        nbt.put(SAMPLE_TAKER_NBT_KEY, sampleTaker.toNbtList(registryLookup));
+        nbt.put(TIER_UPGRADE_NBT_KEY, tierUpgrade.toNbtList(registryLookup));
+        nbt.put(UPGRADES_NBT_KEY, upgrades.toNbtList(registryLookup));
+        nbt.put(SWORD_NBT_KEY, sword.toNbtList(registryLookup));
         nbt.putBoolean(TURNED_ON_NBT_KEY, isTurnedOn);
 
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, registryLookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    protected void readComponents(ComponentsAccess components) {
+        super.readComponents(components);
 
-        dropInventory.fromNbt(nbt.getList(DROP_INVENTORY_NBT_KEY, NbtElement.COMPOUND_TYPE));
-        sampleTaker.readNbtList(nbt.getList(SAMPLE_TAKER_NBT_KEY, NbtElement.COMPOUND_TYPE));
-        tierUpgrade.readNbtList(nbt.getList(TIER_UPGRADE_NBT_KEY, NbtElement.COMPOUND_TYPE));
-        upgrades.readNbtList(nbt.getList(UPGRADES_NBT_KEY, NbtElement.COMPOUND_TYPE));
-        sword.readNbtList(nbt.getList(SWORD_NBT_KEY, NbtElement.COMPOUND_TYPE));
-        isTurnedOn = nbt.getBoolean(TURNED_ON_NBT_KEY);
+        dropInventory.copyFrom(components.getOrDefault(ModComponents.DROP_INVENTORY, dropInventory));
+        sampleTaker.setStack(0, components.getOrDefault(ModComponents.SAMPLE_TAKER, ItemStack.EMPTY));
+        tierUpgrade.setStack(0, components.getOrDefault(ModComponents.TIER_UPGRADE, ItemStack.EMPTY));
+        upgrades.fromStacks(components.getOrDefault(ModComponents.UPGRADES, List.of()));
+        sword.setStack(0, components.getOrDefault(ModComponents.SWORD, ItemStack.EMPTY));
+        setTurnedOn(components.getOrDefault(ModComponents.TURNED_ON, false));
+    }
+
+    @Override
+    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
+        super.addComponents(componentMapBuilder);
+
+        componentMapBuilder.add(ModComponents.DROP_INVENTORY, dropInventory);
+        componentMapBuilder.add(ModComponents.SAMPLE_TAKER, sampleTaker.getStack(0));
+        componentMapBuilder.add(ModComponents.TIER_UPGRADE, tierUpgrade.getStack(0));
+        componentMapBuilder.add(ModComponents.UPGRADES, upgrades.heldStacks);
+        componentMapBuilder.add(ModComponents.SWORD, sword.getStack(0));
+        componentMapBuilder.add(ModComponents.TURNED_ON, isTurnedOn);
+    }
+
+    @SuppressWarnings("deprecation") // Minecraft also overrides this in places
+    @Override
+    public void removeFromCopiedStackNbt(NbtCompound nbt) {
+        super.removeFromCopiedStackNbt(nbt);
+
+        nbt.remove(DROP_INVENTORY_NBT_KEY);
+        nbt.remove(SAMPLE_TAKER_NBT_KEY);
+        nbt.remove(TIER_UPGRADE_NBT_KEY);
+        nbt.remove(UPGRADES_NBT_KEY);
+        nbt.remove(SWORD_NBT_KEY);
+        nbt.remove(TURNED_ON_NBT_KEY);
     }
 
     @Nullable
@@ -357,15 +393,14 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     }
 
     @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        return createNbt();
+    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
+        return createNbt(registryLookup);
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private void dropXp(int amount) {
         final ItemStack sword = getSword();
 
-        if (EnchantmentHelper.get(sword).containsKey(Enchantments.MENDING) && sword.isDamaged()) {
+        if (world instanceof ServerWorld serverWorld && EnchantmentHelper.getLevel(serverWorld.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(Enchantments.MENDING).orElseThrow(), sword) > 0 && sword.isDamaged()) {
             int repairAmount = Math.min(amount * 2, sword.getDamage());
             sword.setDamage(sword.getDamage() - repairAmount);
 
@@ -406,28 +441,30 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
         this.maxEntityHealth = -1;
         this.currentEntityHealth = -1;
 
-        sendPacket(ModPackets.GUI_HEALTH_RESET, PacketByteBufs.create());
+        sendPacket(new ModPackets.GuiHealthChanged(null));
     }
 
     public void setMaxEntityHealth(float maxEntityHealth) {
         this.maxEntityHealth = maxEntityHealth;
 
-
-        final PacketByteBuf buf = PacketByteBufs.create();
-
-        buf.writeFloat(maxEntityHealth);
-
-        sendPacket(ModPackets.GUI_MAX_HEALTH_CHANGED, buf);
+        sendPacket(new ModPackets.GuiMaxHealthChanged(maxEntityHealth));
     }
 
     public void setCurrentEntityHealth(float currentEntityHealth) {
         this.currentEntityHealth = currentEntityHealth;
 
-
-        final PacketByteBuf buf = PacketByteBufs.create();
-
-        buf.writeFloat(currentEntityHealth);
-
-        sendPacket(ModPackets.GUI_HEALTH_CHANGED, buf);
+        sendPacket(new ModPackets.GuiHealthChanged(currentEntityHealth));
     }
+
+    private static class UpgradesInventory extends SimpleInventory {
+        public UpgradesInventory(int size) {
+            super(size);
+        }
+
+        public void fromStacks(List<ItemStack> stacks) {
+            clear();
+            stacks.forEach(this::addStack);
+            markDirty();
+        }
+    };
 }

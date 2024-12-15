@@ -1,6 +1,10 @@
 package top.offsetmonkey538.compactmobfarms.screen;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityType;
@@ -10,7 +14,12 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
@@ -26,22 +35,24 @@ import top.offsetmonkey538.compactmobfarms.item.TierUpgradeItem;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 
+import static top.offsetmonkey538.compactmobfarms.CompactMobFarms.LOGGER;
+
 public class CompactMobFarmScreenHandler extends ScreenHandler {
     private EntityType<?> entityType;
     private float entityHealth, maxEntityHealth, attackSpeed, attackDamage;
     private boolean turnedOn;
     private final ScreenHandlerContext context;
-    private BiConsumer<Identifier, PacketByteBuf> sender = null;
+    private Consumer<CustomPayload> sender = null;
 
-    public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
+    public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, OpeningData data) {
         this(syncId, playerInventory, new SimpleInventory(1), new SimpleInventory(1), new SimpleInventory(4), new SimpleInventory(1), ScreenHandlerContext.EMPTY);
 
-        turnedOn = buf.readBoolean();
-        entityHealth = buf.readFloat();
-        maxEntityHealth = buf.readFloat();
-        attackSpeed = buf.readFloat();
-        attackDamage = buf.readFloat();
-        if (buf.readBoolean()) this.entityType = buf.readRegistryValue(Registries.ENTITY_TYPE);
+        turnedOn = data.turnedOn();
+        entityHealth = data.entityHealth();
+        maxEntityHealth = data.maxEntityHealth();
+        attackSpeed = data.attackSpeed();
+        attackDamage = data.attackDamage();
+        this.entityType = data.entityType.orElse(null);
     }
 
     public CompactMobFarmScreenHandler(int syncId, PlayerInventory playerInventory, Inventory sampleTaker, Inventory tierUpgrade, Inventory upgrades, Inventory sword, ScreenHandlerContext context) {
@@ -50,11 +61,21 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         PlayerEntity player = playerInventory.player;
 
         this.context = context;
+        // Oh my god this whole thing is so stupid but i mean if it works it works... tho it doesn't work yet as i'm
+        //  still implementing it. this is a bad idea.
         context.run((world, pos) -> {
             if (!(world.getBlockEntity(pos) instanceof CompactMobFarmBlockEntity entity && player instanceof ServerPlayerEntity serverPlayer)) return;
-            sender = (id, buf) -> {
-                buf.writeByte(syncId);
-                ServerPlayNetworking.send(serverPlayer, id, buf);
+            sender = payload -> {
+                try {
+                    payload = (CustomPayload) payload.getClass().getDeclaredMethod("setSyncId", Integer.class).invoke(payload, syncId);
+                } catch (IllegalAccessException e) {
+                    LOGGER.error("Couldn't access 'setSyncId' method on class '" + payload.getClass() + "'!", e);
+                } catch (InvocationTargetException e) {
+                    LOGGER.error("Couldn't execute 'setSyncId' method on class '" + payload.getClass() + "'!", e);
+                } catch (NoSuchMethodException e) {
+                    LOGGER.error("Class '" + payload.getClass() + "' doesn't have a 'setSyncId' method!", e);
+                }
+                ServerPlayNetworking.send(serverPlayer, payload);
             };
 
             entity.registerPacketSender(sender);
@@ -76,11 +97,9 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
 
                     if (TierUpgradeItem.isSupported(blockEntity.getTierUpgrade(), entity)) return true;
 
-                    PacketByteBuf buf = PacketByteBufs.create();
-
-                    buf.writeText(Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_insert_sample_taker", Text.translatable(entity.getTranslationKey()), EntityTiers.INSTANCE.requiredTierFor(entity)));
-
-                    blockEntity.sendPacket(ModPackets.GUI_DISPLAY_PROBLEM_MESSAGE, buf);
+                    blockEntity.sendPacket(new ModPackets.GuiDisplayProblemMessage(
+                            Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_insert_sample_taker", Text.translatable(entity.getTranslationKey()), EntityTiers.INSTANCE.requiredTierFor(entity))
+                    ));
 
                     return false;
                 }, false);
@@ -104,11 +123,9 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
                     if (EntityTiers.INSTANCE.isSupported(currentType) && EntityTiers.INSTANCE.tier0Supports(currentType))
                         return true;
 
-                    PacketByteBuf buf = PacketByteBufs.create();
-
-                    buf.writeText(Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_remove_tier_upgrade", Text.translatable(currentType.getTranslationKey())));
-
-                    blockEntity.sendPacket(ModPackets.GUI_DISPLAY_PROBLEM_MESSAGE, buf);
+                    blockEntity.sendPacket(new ModPackets.GuiDisplayProblemMessage(
+                            Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_remove_tier_upgrade", Text.translatable(currentType.getTranslationKey()))
+                    ));
 
                     return false;
                 }, false);
@@ -148,15 +165,35 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         final Slot slot = this.getSlot(slotId);
         final ItemStack originalStack = slot.getStack();
 
-        if (slot.inventory instanceof PlayerInventory) {
-            if (originalStack.isOf(ModItems.FILLED_SAMPLE_TAKER)) return tryInsertInSlot(originalStack, 0);
-            if (originalStack.getItem() instanceof TierUpgradeItem) return tryInsertInSlot(originalStack, 1);
-            if (originalStack.getItem() instanceof CompactMobFarmUpgradeItem) return tryInsertInSlots(originalStack, 2, 5);
+        // If the item isn't *from* the player inventory, try inserting into the player inventory.
+        if (!(slot.inventory instanceof PlayerInventory)) return wrapInsertItem(slot, 7, 42, true);
 
-            return tryInsertInSlot(originalStack, 6);
+        // First try inserting into specific slots ...
+        if (originalStack.isOf(ModItems.FILLED_SAMPLE_TAKER)) return wrapInsertItem(slot, 0);
+        if (originalStack.getItem() instanceof TierUpgradeItem) return wrapInsertItem(slot, 1);
+        if (originalStack.getItem() instanceof CompactMobFarmUpgradeItem) return wrapInsertItem(slot, 2, 5, false);
+
+        // ... then to the sword slot. This way a tier upgrade wouldn't be used as a sword when quick moving.
+        return wrapInsertItem(slot, 6);
+    }
+
+    /*
+        The 'insertItem' method is kinda weird in my opinion. The start and end indexes are used like this:
+        "...inserting to slots from startIndex to endIndex - 1 (both inclusive) until the entire stack is used."
+        So for only adding to one slot, the start index would be x and end index x+1. Not sure why it's not just from
+        the start index to the end index but yeah it is what it is.
+
+        That's why my wrapper method increments the end index by one, Makes it easier for me to wrap my head around.
+     */
+    private ItemStack wrapInsertItem(Slot slot, int startIndex, int endIndex, boolean fromLast) {
+        if (insertItem(slot.getStack(), startIndex, endIndex + 1, fromLast)) {
+            slot.markDirty();
+            return slot.getStack();
         }
-
-        return tryInsertInSlots(originalStack, 7, 42);
+        return ItemStack.EMPTY;
+    }
+    private ItemStack wrapInsertItem(Slot slot, int index) {
+        return wrapInsertItem(slot, index, index, false);
     }
 
     private ItemStack tryInsertInSlot(ItemStack stackToInsert, int slotId) {
@@ -175,7 +212,6 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
         return ItemStack.EMPTY;
     }
 
-    @SuppressWarnings("SameParameterValue")
     private ItemStack tryInsertInSlots(ItemStack stackToInsert, int startSlotId, int endSlotId) {
         for (int insertionSlotId = startSlotId; insertionSlotId <= endSlotId; insertionSlotId++) {
             ItemStack newStack = tryInsertInSlot(stackToInsert, insertionSlotId);
@@ -241,5 +277,37 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
 
     public float getAttackDamage() {
         return attackDamage;
+    }
+
+
+    public record OpeningData(
+            boolean turnedOn,
+            float entityHealth,
+            float maxEntityHealth,
+            float attackSpeed,
+            float attackDamage,
+            Optional<EntityType<?>> entityType
+    ) {
+        public static final PacketCodec<RegistryByteBuf, OpeningData> PACKET_CODEC = PacketCodec.tuple(
+                PacketCodecs.BOOL,
+                OpeningData::turnedOn,
+
+                PacketCodecs.FLOAT,
+                OpeningData::entityHealth,
+
+                PacketCodecs.FLOAT,
+                OpeningData::maxEntityHealth,
+
+                PacketCodecs.FLOAT,
+                OpeningData::attackSpeed,
+
+                PacketCodecs.FLOAT,
+                OpeningData::attackDamage,
+
+                PacketCodecs.optional(PacketCodecs.registryValue(RegistryKeys.ENTITY_TYPE)),
+                OpeningData::entityType,
+
+                OpeningData::new
+        );
     }
 }

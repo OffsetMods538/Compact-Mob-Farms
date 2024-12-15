@@ -142,24 +142,6 @@ public class EntityTiers {
         return tier4Supports(entity);
     }
 
-    public void fromUpdatePacket(PacketByteBuf buf) {
-        UNSUPPORTED.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
-        TIER_0.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
-        TIER_1.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
-        TIER_2.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
-        TIER_3.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
-        TIER_4.addAll(buf.readList(buf1 -> buf1.readRegistryValue(Registries.ENTITY_TYPE)));
-    }
-
-    public void toUpdatePacket(PacketByteBuf buf) {
-        buf.writeCollection(UNSUPPORTED, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
-        buf.writeCollection(TIER_0, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
-        buf.writeCollection(TIER_1, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
-        buf.writeCollection(TIER_2, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
-        buf.writeCollection(TIER_3, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
-        buf.writeCollection(TIER_4, (buf1, entity) -> buf1.writeRegistryValue(Registries.ENTITY_TYPE, entity));
-    }
-
     @Override
     public String toString() {
         return  "\n" + "Unsupported: " + UNSUPPORTED +

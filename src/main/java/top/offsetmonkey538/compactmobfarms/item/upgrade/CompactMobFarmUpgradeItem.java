@@ -1,6 +1,5 @@
 package top.offsetmonkey538.compactmobfarms.item.upgrade;
 
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -8,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 
 public abstract class CompactMobFarmUpgradeItem extends Item {
-    public CompactMobFarmUpgradeItem(FabricItemSettings settings) {
+    public CompactMobFarmUpgradeItem(Item.Settings settings) {
         super(settings);
     }
 

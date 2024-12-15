@@ -3,19 +3,38 @@ package top.offsetmonkey538.compactmobfarms.inventory;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.registry.RegistryWrapper;
+import org.jetbrains.annotations.NotNull;
+import top.offsetmonkey538.compactmobfarms.CompactMobFarms;
 
-@SuppressWarnings("UnstableApiUsage")
 public class CompactMobFarmInventory implements SlottedStorage<ItemVariant> {
+    public static final Codec<CompactMobFarmInventory> CODEC = Codec.list(ItemStack.CODEC).xmap(CompactMobFarmInventory::new, inventory -> inventory.slots.stream().map(slot -> slot.stack).toList());
+    public static final PacketCodec<RegistryByteBuf, CompactMobFarmInventory> PACKET_CODEC = ItemStack.PACKET_CODEC.collect(PacketCodecs.toList()).xmap(CompactMobFarmInventory::new, inventory -> inventory.slots.stream().map(slot -> slot.stack).toList());
+
     private final List<Slot> slots = new ArrayList<>();
+
+    public CompactMobFarmInventory() {}
+    public CompactMobFarmInventory(List<ItemStack> stacks) {
+        stacks.forEach(stack -> slots.add(new Slot(stack)));
+    }
 
     @Override
     public int getSlotCount() {
@@ -38,7 +57,7 @@ public class CompactMobFarmInventory implements SlottedStorage<ItemVariant> {
 
         for (Slot slot : slots) {
             final ItemStack storedStack = slot.getStack();
-            if (!storedStack.isOf(resource.getItem()) || (resource.getNbt() != null && resource.getNbt().equals(storedStack.getNbt()))) continue;
+            if (!ItemStack.areItemsAndComponentsEqual(storedStack, resource.toStack())) continue;
 
             int oldCount = storedStack.getCount();
             int newCount = (int) Math.min(64, oldCount + maxAmount);
@@ -66,7 +85,7 @@ public class CompactMobFarmInventory implements SlottedStorage<ItemVariant> {
 
         for (Slot slot : slots) {
             final ItemStack storedStack = slot.getStack();
-            if (!storedStack.isOf(resource.getItem()) || (resource.getNbt() != null && resource.getNbt().equals(storedStack.getNbt()))) continue;
+            if (!ItemStack.areItemsAndComponentsEqual(storedStack, resource.toStack())) continue;
 
             int oldCount = storedStack.getCount();
             int newCount = (int) Math.min(0, oldCount - maxAmount);
@@ -82,6 +101,7 @@ public class CompactMobFarmInventory implements SlottedStorage<ItemVariant> {
     }
 
     @Override
+    @NotNull
     public Iterator<StorageView<ItemVariant>> iterator() {
         return new Iterator<>() {
             int i = 0;
@@ -98,16 +118,21 @@ public class CompactMobFarmInventory implements SlottedStorage<ItemVariant> {
         };
     }
 
-    public NbtList toNbtList() {
+    public NbtList toNbtList(RegistryWrapper.WrapperLookup registryLookup) {
         final NbtList nbt = new NbtList();
 
-        slots.forEach((Slot slot) -> nbt.add(slot.toNbt()));
+        slots.forEach((Slot slot) -> nbt.add(slot.toNbt(registryLookup)));
 
         return nbt;
     }
 
-    public void fromNbt(NbtList nbtList) {
-        nbtList.forEach(nbt -> slots.add(new Slot((NbtCompound) nbt)));
+    public void fromNbt(NbtList nbtList, RegistryWrapper.WrapperLookup registryLookup) {
+        nbtList.forEach(nbt -> slots.add(new Slot((NbtCompound) nbt, registryLookup)));
+    }
+
+    public void copyFrom(CompactMobFarmInventory original) {
+        slots.clear();
+        slots.addAll(original.slots);
     }
 
     private class Slot extends SingleStackStorage {
@@ -116,8 +141,8 @@ public class CompactMobFarmInventory implements SlottedStorage<ItemVariant> {
         public Slot(ItemStack stack) {
             this.stack = stack;
         }
-        public Slot(NbtCompound nbt) {
-            this(ItemStack.fromNbt(nbt));
+        public Slot(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+            this(ItemStack.fromNbt(registryLookup, nbt).orElse(ItemStack.EMPTY));
         }
 
         @Override
@@ -135,8 +160,8 @@ public class CompactMobFarmInventory implements SlottedStorage<ItemVariant> {
             if (stack.isEmpty()) CompactMobFarmInventory.this.slots.remove(this);
         }
 
-        public NbtCompound toNbt() {
-            return stack.writeNbt(new NbtCompound());
+        public NbtCompound toNbt(RegistryWrapper.WrapperLookup registryLookup) {
+            return (NbtCompound) stack.encode(registryLookup);
         }
     }
 }

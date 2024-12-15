@@ -2,16 +2,19 @@ package top.offsetmonkey538.compactmobfarms.datagen.language;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
+import net.minecraft.registry.RegistryWrapper;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 
+import java.util.concurrent.CompletableFuture;
+
 public class ModEstonianLanguageProvider extends FabricLanguageProvider {
-    public ModEstonianLanguageProvider(FabricDataOutput dataOutput) {
-        super(dataOutput, "et_ee");
+    public ModEstonianLanguageProvider(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
+        super(dataOutput, "et_ee", registryLookup);
     }
 
     @Override
-    public void generateTranslations(TranslationBuilder translationBuilder) {
+    public void generateTranslations(RegistryWrapper.WrapperLookup registryLookup, TranslationBuilder translationBuilder) {
         translationBuilder.add("emi_info.compact_mob_farms.sampling", "Kasuta proovivõtjat olendi \"%s\" peal 10 korda.");
 
         translationBuilder.add("itemGroup.compact_mob_farms.main_group", "Kompaktsed Olendi Farmid");

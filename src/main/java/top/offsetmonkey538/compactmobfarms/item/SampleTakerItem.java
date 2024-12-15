@@ -1,11 +1,11 @@
 package top.offsetmonkey538.compactmobfarms.item;
 
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
@@ -17,6 +17,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import top.offsetmonkey538.compactmobfarms.component.ModComponents;
 import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
 import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
 
@@ -39,8 +40,11 @@ public class SampleTakerItem extends Item {
         final List<UUID> samplesCollected = getSamplesCollected(stack);
         final UUID targetUuid = targetEntity.getUuid();
 
-        if (!EntityTiers.INSTANCE.isSupported(targetEntity.getType()) || samplesCollected.contains(targetUuid) || (sampledEntiyIdentifier != null && !sampledEntiyIdentifier.equals(targetEntityIdentifier))) return super.useOnEntity(stack, user, targetEntity, hand);
-
+        if (!EntityTiers.INSTANCE.isSupported(targetEntity.getType()) || samplesCollected.contains(targetUuid) || (sampledEntiyIdentifier != null && !sampledEntiyIdentifier.equals(targetEntityIdentifier))) {
+            System.out.println((user.getWorld().isClient() ? "client: " : "server: ") + "samples: " + samplesCollected.size() + " canceled\n");
+            return super.useOnEntity(stack, user, targetEntity, hand);
+        }
+        System.out.println((user.getWorld().isClient() ? "client: " : "server: ") + "samples: " + samplesCollected.size() + "\n");
 
         if (user.getWorld().isClient()) return ActionResult.SUCCESS;
 
@@ -75,7 +79,7 @@ public class SampleTakerItem extends Item {
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         final List<UUID> samplesCollected = getSamplesCollected(stack);
         final EntityType<?> sampledEntity = getSampledEntityType(stack);
 
@@ -86,21 +90,17 @@ public class SampleTakerItem extends Item {
     }
 
     public static void setSampledEntity(ItemStack stack, Identifier entity) {
-        stack.getOrCreateNbt().putString(SAMPLED_ENTITY_KEY, entity.toString());
+        stack.set(ModComponents.SAMPLED_ENTITY, entity);
     }
 
     public static void setSamplesCollected(ItemStack stack, List<UUID> samplesCollected) {
-        NbtList nbtList = new NbtList();
-
-        samplesCollected.forEach(uuid -> nbtList.add(NbtHelper.fromUuid(uuid)));
-
-        stack.getOrCreateNbt().put(SAMPLES_COLLECTED_KEY, nbtList);
+        stack.set(ModComponents.SAMPLES_COLLECTED, samplesCollected);
     }
 
     @Nullable
     public static Identifier getSampledEntityId(ItemStack stack) {
-        if (stack.getNbt() == null || !stack.getNbt().contains(SAMPLED_ENTITY_KEY)) return null;
-        return IdentifierUtils.INSTANCE.of(stack.getNbt().getString(SAMPLED_ENTITY_KEY));
+        if (!stack.contains(ModComponents.SAMPLED_ENTITY)) return null;
+        return stack.get(ModComponents.SAMPLED_ENTITY);
     }
 
     @Nullable
@@ -113,13 +113,8 @@ public class SampleTakerItem extends Item {
     }
 
     public static List<UUID> getSamplesCollected(ItemStack stack) {
-        List<UUID> result = new ArrayList<>();
-
-        if (stack.getNbt() == null || !stack.getNbt().contains(SAMPLES_COLLECTED_KEY)) return result;
-
-        NbtList nbtList = stack.getNbt().getList(SAMPLES_COLLECTED_KEY, NbtElement.INT_ARRAY_TYPE);
-        nbtList.forEach(nbtUuid -> result.add(NbtHelper.toUuid(nbtUuid)));
-
-        return result;
+        if (!stack.contains(ModComponents.SAMPLES_COLLECTED)) return new ArrayList<>();
+        //noinspection DataFlowIssue
+        return new ArrayList<>(stack.get(ModComponents.SAMPLES_COLLECTED));
     }
 }

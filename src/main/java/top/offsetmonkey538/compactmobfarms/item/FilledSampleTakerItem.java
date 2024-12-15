@@ -1,14 +1,15 @@
 package top.offsetmonkey538.compactmobfarms.item;
 
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import top.offsetmonkey538.compactmobfarms.component.ModComponents;
 import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class FilledSampleTakerItem extends Item {
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         final EntityType<?> sampledEntity = getSampledEntityType(stack);
 
         if (sampledEntity == null) return;
@@ -30,13 +31,12 @@ public class FilledSampleTakerItem extends Item {
     }
 
     public static void setSampledEntity(ItemStack stack, Identifier entity) {
-        stack.getOrCreateNbt().putString(SAMPLED_ENTITY_KEY, entity.toString());
+        stack.set(ModComponents.SAMPLED_ENTITY, entity);
     }
 
     @Nullable
     public static Identifier getSampledEntityId(ItemStack stack) {
-        if (stack.getNbt() == null || !stack.getNbt().contains(SAMPLED_ENTITY_KEY)) return null;
-        return IdentifierUtils.INSTANCE.of(stack.getNbt().getString(SAMPLED_ENTITY_KEY));
+        return SampleTakerItem.getSampledEntityId(stack);
     }
 
     @Nullable
