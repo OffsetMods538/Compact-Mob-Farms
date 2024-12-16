@@ -1,5 +1,6 @@
 package top.offsetmonkey538.compactmobfarms.block.entity;
 
+import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -59,6 +60,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory<CompactMobFarmScreenHandler.OpeningData> {
+    public static final GameProfile FAKE_PLAYER_PROFILE = new GameProfile(FakePlayer.DEFAULT_UUID, "[CompactMobFarms - Compact Mob Farm]");
+
     public static final String DROP_INVENTORY_NBT_KEY = "DropInventory";
     public static final String SAMPLE_TAKER_NBT_KEY = "SampleTaker";
     public static final String TIER_UPGRADE_NBT_KEY = "TierUpgrade";
@@ -184,7 +187,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
     private void checkHealthAndKillEntity() {
         if (!(world instanceof ServerWorld serverWorld)) return;
 
-        final FakePlayer player = FakePlayer.get(serverWorld);
+        final FakePlayer player = FakePlayer.get(serverWorld, FAKE_PLAYER_PROFILE);
         if (this.getSword() != null) {
             player.setStackInHand(Hand.MAIN_HAND, this.getSword());
             if(EnchantmentHelper.getLevel(serverWorld.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(Enchantments.FIRE_ASPECT).orElseThrow(), getSword()) > 0) currentEntity.setFireTicks(1);
@@ -264,7 +267,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
 
 
         if (sword != null && target != null && world instanceof ServerWorld serverWorld) {
-            final FakePlayer player = FakePlayer.get(serverWorld);
+            final FakePlayer player = FakePlayer.get(serverWorld, FAKE_PLAYER_PROFILE);
             player.setStackInHand(Hand.MAIN_HAND, sword);
 
             result.updateAndGet(v -> v + EnchantmentHelper.getDamage(serverWorld, sword, target, serverWorld.getDamageSources().playerAttack(player), 0));
@@ -466,5 +469,5 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
             stacks.forEach(this::addStack);
             markDirty();
         }
-    };
+    }
 }

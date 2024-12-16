@@ -27,6 +27,7 @@ import top.offsetmonkey538.compactmobfarms.config.EntityTierResourceReloadListen
 import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.group.ModItemGroups;
+import top.offsetmonkey538.compactmobfarms.loot.condition.ModLootConditionTypes;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.recipe.ModRecipes;
 import top.offsetmonkey538.compactmobfarms.screen.ModScreenHandlers;
@@ -47,6 +48,7 @@ public class CompactMobFarms implements ModInitializer {
 		ModScreenHandlers.register();
 		ModRecipes.register();
 		ModPackets.register();
+		ModLootConditionTypes.register();
 
         ItemStorage.SIDED.registerForBlockEntity((block, direction) -> block.getDropInventory(), ModBlockEntityTypes.COMPACT_MOB_FARM);
 
