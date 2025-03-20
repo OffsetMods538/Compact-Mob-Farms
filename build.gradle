@@ -102,6 +102,7 @@ repositories {
 		url  = "https://maven.offsetmonkey538.top/releases"
 		content {
 			includeGroup "top.offsetmonkey538.monkeylib538"
+			includeGroup "top.offsetmonkey538.loottablemodifier"
 		}
 	}
 	maven {
@@ -129,6 +130,11 @@ dependencies {
 
 	// MonkeyLib538
 	modImplementation "top.offsetmonkey538.monkeylib538:monkeylib538:${project.monkeylib538_version}"
+
+	// Loot Table Modifier
+	modImplementation("top.offsetmonkey538.loottablemodifier:loot-table-modifier:${project.lootmod_version}") {
+		exclude group: "net.fabricmc.fabric-api" // It's for a newer version so they conflict and shtuff
+	}
 
 	// EMI
 	modCompileOnly  "dev.emi:emi-fabric:${project.emi_version}:api"

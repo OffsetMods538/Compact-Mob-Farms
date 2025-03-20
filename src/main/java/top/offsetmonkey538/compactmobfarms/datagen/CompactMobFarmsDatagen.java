@@ -21,5 +21,7 @@ public class CompactMobFarmsDatagen implements DataGeneratorEntrypoint {
 
         pack.addProvider(ModEnglishLanguageProvider::new);
         pack.addProvider(ModEstonianLanguageProvider::new);
+
+        BuiltinPacksDatagen.runDatagen(fabricDataGenerator);
     }
 }

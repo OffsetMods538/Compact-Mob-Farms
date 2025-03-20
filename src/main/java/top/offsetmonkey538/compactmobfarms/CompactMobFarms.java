@@ -23,6 +23,7 @@ import top.offsetmonkey538.compactmobfarms.block.entity.ModBlockEntityTypes;
 import top.offsetmonkey538.compactmobfarms.component.ModComponents;
 import top.offsetmonkey538.compactmobfarms.config.EntityTierResourceReloadListener;
 import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
+import top.offsetmonkey538.compactmobfarms.datagen.builtin.BuiltinPacksDatagen;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.group.ModItemGroups;
 import top.offsetmonkey538.compactmobfarms.loot.condition.ModLootConditionTypes;
@@ -67,6 +68,9 @@ public class CompactMobFarms implements ModInitializer {
 					EntityTiers.INSTANCE
 			));
 		});
+
+
+		BuiltinPacksDatagen.registerBuiltinPacks();
 	}
 
 	public static Identifier id(String path) {
