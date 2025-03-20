@@ -10,12 +10,11 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
 import org.jetbrains.annotations.Nullable;
+import top.offsetmonkey538.compactmobfarms.CompactMobFarms;
 import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
 
 import java.util.List;
 import java.util.Optional;
-
-import static top.offsetmonkey538.compactmobfarms.CompactMobFarms.id;
 
 public final class ModPackets {
     private ModPackets() {
@@ -35,7 +34,7 @@ public final class ModPackets {
     }
 
     public record GuiEntityChanged(int syncId, Optional<EntityType<?>> newEntity) implements CustomPayload {
-        public static final CustomPayload.Id<GuiEntityChanged> ID = new CustomPayload.Id<>(id("gui_entity_changed"));
+        public static final CustomPayload.Id<GuiEntityChanged> ID = new CustomPayload.Id<>(CompactMobFarms.id("gui_entity_changed"));
         public static final PacketCodec<RegistryByteBuf, GuiEntityChanged> CODEC = PacketCodec.tuple(
                 PacketCodecs.VAR_INT,
                 GuiEntityChanged::syncId,
@@ -64,7 +63,7 @@ public final class ModPackets {
     }
 
     public record GuiHealthChanged(int syncId, Optional<Float> newHealth) implements CustomPayload {
-        public static final CustomPayload.Id<GuiHealthChanged> ID = new CustomPayload.Id<>(id("gui_health_changed"));
+        public static final CustomPayload.Id<GuiHealthChanged> ID = new CustomPayload.Id<>(CompactMobFarms.id("gui_health_changed"));
         public static final PacketCodec<RegistryByteBuf, GuiHealthChanged> CODEC = PacketCodec.tuple(
                 PacketCodecs.VAR_INT,
                 GuiHealthChanged::syncId,
@@ -93,7 +92,7 @@ public final class ModPackets {
     }
 
     public record GuiMaxHealthChanged(int syncId, float newMaxHealth) implements CustomPayload {
-        public static final CustomPayload.Id<GuiMaxHealthChanged> ID = new CustomPayload.Id<>(id("gui_max_health_changed"));
+        public static final CustomPayload.Id<GuiMaxHealthChanged> ID = new CustomPayload.Id<>(CompactMobFarms.id("gui_max_health_changed"));
         public static final PacketCodec<RegistryByteBuf, GuiMaxHealthChanged> CODEC = PacketCodec.tuple(
                 PacketCodecs.VAR_INT,
                 GuiMaxHealthChanged::syncId,
@@ -122,7 +121,7 @@ public final class ModPackets {
     }
 
     public record GuiAttackSpeedChanged(int syncId, float newAttackSpeed) implements CustomPayload {
-        public static final CustomPayload.Id<GuiAttackSpeedChanged> ID = new CustomPayload.Id<>(id("gui_attack_speed_changed"));
+        public static final CustomPayload.Id<GuiAttackSpeedChanged> ID = new CustomPayload.Id<>(CompactMobFarms.id("gui_attack_speed_changed"));
         public static final PacketCodec<RegistryByteBuf, GuiAttackSpeedChanged> CODEC = PacketCodec.tuple(
                 PacketCodecs.VAR_INT,
                 GuiAttackSpeedChanged::syncId,
@@ -151,7 +150,7 @@ public final class ModPackets {
     }
 
     public record GuiAttackDamageChanged(int syncId, float newAttackDamage) implements CustomPayload {
-        public static final CustomPayload.Id<GuiAttackDamageChanged> ID = new CustomPayload.Id<>(id("gui_attack_damage_changed"));
+        public static final CustomPayload.Id<GuiAttackDamageChanged> ID = new CustomPayload.Id<>(CompactMobFarms.id("gui_attack_damage_changed"));
         public static final PacketCodec<RegistryByteBuf, GuiAttackDamageChanged> CODEC = PacketCodec.tuple(
                 PacketCodecs.VAR_INT,
                 GuiAttackDamageChanged::syncId,
@@ -180,7 +179,7 @@ public final class ModPackets {
     }
 
     public record GuiDisplayProblemMessage(int syncId, Text problemMessage) implements CustomPayload {
-        public static final CustomPayload.Id<GuiDisplayProblemMessage> ID = new CustomPayload.Id<>(id("gui_display_problem_message"));
+        public static final CustomPayload.Id<GuiDisplayProblemMessage> ID = new CustomPayload.Id<>(CompactMobFarms.id("gui_display_problem_message"));
         public static final PacketCodec<RegistryByteBuf, GuiDisplayProblemMessage> CODEC = PacketCodec.tuple(
                 PacketCodecs.VAR_INT,
                 GuiDisplayProblemMessage::syncId,
@@ -216,7 +215,7 @@ public final class ModPackets {
             List<EntityType<?>> tier3,
             List<EntityType<?>> tier4
     ) implements CustomPayload {
-        public static final CustomPayload.Id<EntityTierListChanged> ID = new CustomPayload.Id<>(id("entity_tier_list_changed"));
+        public static final CustomPayload.Id<EntityTierListChanged> ID = new CustomPayload.Id<>(CompactMobFarms.id("entity_tier_list_changed"));
         public static final PacketCodec<RegistryByteBuf, EntityTierListChanged> CODEC = PacketCodec.tuple(
                 PacketCodecs.registryValue(RegistryKeys.ENTITY_TYPE).collect(PacketCodecs.toList()),
                 EntityTierListChanged::unsupported,
@@ -241,12 +240,12 @@ public final class ModPackets {
 
         public EntityTierListChanged(EntityTiers tiers) {
             this(
-                    tiers.UNSUPPORTED,
-                    tiers.TIER_0,
-                    tiers.TIER_1,
-                    tiers.TIER_2,
-                    tiers.TIER_3,
-                    tiers.TIER_4
+                    tiers.getUnsupported(),
+                    tiers.getTier0(),
+                    tiers.getTier1(),
+                    tiers.getTier2(),
+                    tiers.getTier3(),
+                    tiers.getTier4()
             );
         }
 

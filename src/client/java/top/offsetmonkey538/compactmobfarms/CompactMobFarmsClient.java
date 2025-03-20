@@ -4,18 +4,11 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.client.render.debug.DebugRenderer;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.entity.EntityType;
 import net.minecraft.item.SpawnEggItem;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.ColorHelper;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.ModBlockEntityTypes;
@@ -113,12 +106,14 @@ public class CompactMobFarmsClient implements ClientModInitializer {
 		ClientPlayNetworking.registerGlobalReceiver(ModPackets.EntityTierListChanged.ID, (payload, context) -> {
 			EntityTiers.INSTANCE.clear();
 
-			EntityTiers.INSTANCE.UNSUPPORTED = payload.unsupported();
-			EntityTiers.INSTANCE.TIER_0 = payload.tier0();
-			EntityTiers.INSTANCE.TIER_1 = payload.tier1();
-			EntityTiers.INSTANCE.TIER_2 = payload.tier2();
-			EntityTiers.INSTANCE.TIER_3 = payload.tier3();
-			EntityTiers.INSTANCE.TIER_4 = payload.tier4();
+			EntityTiers.INSTANCE.add(new EntityTiers(
+					payload.unsupported(),
+					payload.tier0(),
+					payload.tier1(),
+					payload.tier2(),
+					payload.tier3(),
+					payload.tier4()
+			));
 		});
 	}
 }

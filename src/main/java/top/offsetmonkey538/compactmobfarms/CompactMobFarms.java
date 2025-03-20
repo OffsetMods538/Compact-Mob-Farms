@@ -3,7 +3,6 @@ package top.offsetmonkey538.compactmobfarms;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -14,7 +13,6 @@ import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.function.ApplyBonusLootFunction;
 import net.minecraft.loot.function.SetCountLootFunction;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
@@ -31,7 +29,6 @@ import top.offsetmonkey538.compactmobfarms.loot.condition.ModLootConditionTypes;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.recipe.ModRecipes;
 import top.offsetmonkey538.compactmobfarms.screen.ModScreenHandlers;
-import top.offsetmonkey538.monkeylib538.utils.EnchantmentUtils;
 import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
 
 public class CompactMobFarms implements ModInitializer {
@@ -63,7 +60,7 @@ public class CompactMobFarms implements ModInitializer {
 			tableBuilder.pool(pool);
 		});
 
-		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new EntityTierResourceReloadListener());
+		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(EntityTierResourceReloadListener.ID, EntityTierResourceReloadListener::new);
 
 		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
 			ServerPlayNetworking.send(player, new ModPackets.EntityTierListChanged(
