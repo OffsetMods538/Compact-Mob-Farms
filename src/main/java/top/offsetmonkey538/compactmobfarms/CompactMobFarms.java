@@ -65,7 +65,7 @@ public class CompactMobFarms implements ModInitializer {
 
 		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
 			ServerPlayNetworking.send(player, new ModPackets.EntityTierListChanged(
-					EntityTiers.INSTANCE
+					EntityTiers.instance
 			));
 		});
 

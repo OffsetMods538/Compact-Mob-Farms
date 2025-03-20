@@ -104,10 +104,8 @@ public class CompactMobFarmsClient implements ClientModInitializer {
 		});
 
 		ClientPlayNetworking.registerGlobalReceiver(ModPackets.EntityTierListChanged.ID, (payload, context) -> {
-			EntityTiers.INSTANCE.clear();
-
-			EntityTiers.INSTANCE.add(new EntityTiers(
-					payload.unsupported(),
+			EntityTiers.setInstance(new EntityTiers(
+					null, null,
 					payload.tier0(),
 					payload.tier1(),
 					payload.tier2(),

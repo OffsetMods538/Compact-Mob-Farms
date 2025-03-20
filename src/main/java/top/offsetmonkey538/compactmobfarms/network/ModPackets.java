@@ -208,7 +208,6 @@ public final class ModPackets {
     }
 
     public record EntityTierListChanged(
-            List<EntityType<?>> unsupported,
             List<EntityType<?>> tier0,
             List<EntityType<?>> tier1,
             List<EntityType<?>> tier2,
@@ -217,9 +216,6 @@ public final class ModPackets {
     ) implements CustomPayload {
         public static final CustomPayload.Id<EntityTierListChanged> ID = new CustomPayload.Id<>(CompactMobFarms.id("entity_tier_list_changed"));
         public static final PacketCodec<RegistryByteBuf, EntityTierListChanged> CODEC = PacketCodec.tuple(
-                PacketCodecs.registryValue(RegistryKeys.ENTITY_TYPE).collect(PacketCodecs.toList()),
-                EntityTierListChanged::unsupported,
-
                 PacketCodecs.registryValue(RegistryKeys.ENTITY_TYPE).collect(PacketCodecs.toList()),
                 EntityTierListChanged::tier0,
 
@@ -240,12 +236,11 @@ public final class ModPackets {
 
         public EntityTierListChanged(EntityTiers tiers) {
             this(
-                    tiers.getUnsupported(),
-                    tiers.getTier0(),
-                    tiers.getTier1(),
-                    tiers.getTier2(),
-                    tiers.getTier3(),
-                    tiers.getTier4()
+                    tiers.tier0(),
+                    tiers.tier1(),
+                    tiers.tier2(),
+                    tiers.tier3(),
+                    tiers.tier4()
             );
         }
 

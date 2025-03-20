@@ -29,7 +29,7 @@ public class CompactMobFarmsEmiPlugin implements EmiPlugin {
                 .build()
         );
 
-        for (EntityType<?> entity : EntityTiers.INSTANCE.getSupported()) {
+        for (EntityType<?> entity : EntityTiers.instance.getSupported()) {
             registry.addRecipe(new EmiInfoRecipe(
                     List.of(
                             EmiIngredient.of(Ingredient.ofItems(ModItems.SAMPLE_TAKER)),

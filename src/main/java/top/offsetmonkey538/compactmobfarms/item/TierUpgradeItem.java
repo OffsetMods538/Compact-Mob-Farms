@@ -12,13 +12,13 @@ public class TierUpgradeItem extends Item {
     }
 
     public static boolean isSupported(ItemStack tier, EntityType<?> entity) {
-        if (!EntityTiers.INSTANCE.isSupported(entity)) return false;
+        if (!EntityTiers.instance.anySupports(entity)) return false;
 
-        if (tier == null || tier.isEmpty()) return EntityTiers.INSTANCE.tier0Supports(entity);
-        if (tier.isOf(ModItems.TIER_1_UPGRADE)) return EntityTiers.INSTANCE.tier1Supports(entity);
-        if (tier.isOf(ModItems.TIER_2_UPGRADE)) return EntityTiers.INSTANCE.tier2Supports(entity);
-        if (tier.isOf(ModItems.TIER_3_UPGRADE)) return EntityTiers.INSTANCE.tier3Supports(entity);
-        if (tier.isOf(ModItems.TIER_4_UPGRADE)) return EntityTiers.INSTANCE.tier4Supports(entity);
+        if (tier == null || tier.isEmpty()) return EntityTiers.instance.tier0Supports(entity);
+        if (tier.isOf(ModItems.TIER_1_UPGRADE)) return EntityTiers.instance.tier1Supports(entity);
+        if (tier.isOf(ModItems.TIER_2_UPGRADE)) return EntityTiers.instance.tier2Supports(entity);
+        if (tier.isOf(ModItems.TIER_3_UPGRADE)) return EntityTiers.instance.tier3Supports(entity);
+        if (tier.isOf(ModItems.TIER_4_UPGRADE)) return EntityTiers.instance.tier4Supports(entity);
 
         return false;
     }

@@ -15,18 +15,24 @@ import java.util.stream.Stream;
 
 public abstract class EntityTiersProvider extends FabricCodecDataProvider<EntityTiers> {
     private final Identifier id;
-    private EntityTiers tiers;
+    private final int priority;
+    private EntityTiers.Builder builder;
 
-    public EntityTiersProvider(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture, Identifier id) {
-        super(dataOutput, registriesFuture, DataOutput.OutputType.DATA_PACK, EntityTierResourceReloadListener.NAME, EntityTiers.CODEC);
+    public EntityTiersProvider(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture, Identifier id, int priority) {
+        super(dataOutput, registriesFuture, DataOutput.OutputType.DATA_PACK, EntityTierResourceReloadListener.NAME, EntityTiers.FILE_CODEC);
         this.id = id;
+        this.priority = priority;
     }
+    public EntityTiersProvider(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture, Identifier id) {
+        this(dataOutput, registriesFuture, id, 0);
+    }
+
 
     @Override
     protected void configure(BiConsumer<Identifier, EntityTiers> consumer, RegistryWrapper.WrapperLookup lookup) {
-        tiers = new EntityTiers();
+        builder = new EntityTiers.Builder().setPriority(priority);
         generate(lookup);
-        consumer.accept(id, tiers);
+        consumer.accept(id, builder.build());
     }
 
     @Override
@@ -37,26 +43,26 @@ public abstract class EntityTiersProvider extends FabricCodecDataProvider<Entity
     protected abstract void generate(RegistryWrapper.WrapperLookup lookup);
 
     protected void addUnsupported(EntityType<?> entity, EntityType<?>... entityAdditional) {
-        this.tiers.getUnsupported().addAll(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
+        this.builder.addAllUnsupported(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
     }
 
     protected void addTier0(EntityType<?> entity, EntityType<?>... entityAdditional) {
-        this.tiers.getTier0().addAll(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
+        this.builder.addAllTier0(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
     }
 
     protected void addTier1(EntityType<?> entity, EntityType<?>... entityAdditional) {
-        this.tiers.getTier1().addAll(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
+        this.builder.addAllTier1(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
     }
 
     protected void addTier2(EntityType<?> entity, EntityType<?>... entityAdditional) {
-        this.tiers.getTier2().addAll(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
+        this.builder.addAllTier2(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
     }
 
     protected void addTier3(EntityType<?> entity, EntityType<?>... entityAdditional) {
-        this.tiers.getTier3().addAll(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
+        this.builder.addAllTier3(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
     }
 
     protected void addTier4(EntityType<?> entity, EntityType<?>... entityAdditional) {
-        this.tiers.getTier4().addAll(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
+        this.builder.addAllTier4(Stream.concat(Stream.of(entity), Stream.of(entityAdditional)).toList());
     }
 }
