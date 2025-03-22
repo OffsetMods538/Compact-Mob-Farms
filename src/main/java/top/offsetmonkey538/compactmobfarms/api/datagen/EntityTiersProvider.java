@@ -37,7 +37,7 @@ public abstract class EntityTiersProvider extends FabricCodecDataProvider<Entity
 
     @Override
     public String getName() {
-        return EntityTierResourceReloadListener.NAME;
+        return "%s/%s/%s".formatted(id.getNamespace(), EntityTierResourceReloadListener.NAME, id.getPath());
     }
 
     protected abstract void generate(RegistryWrapper.WrapperLookup lookup);
