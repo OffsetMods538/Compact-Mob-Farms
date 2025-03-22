@@ -3,10 +3,10 @@ package top.offsetmonkey538.compactmobfarms;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.loot.LootPool;
@@ -14,7 +14,6 @@ import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.function.ApplyBonusLootFunction;
 import net.minecraft.loot.function.SetCountLootFunction;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
@@ -25,18 +24,20 @@ import top.offsetmonkey538.compactmobfarms.block.entity.ModBlockEntityTypes;
 import top.offsetmonkey538.compactmobfarms.component.ModComponents;
 import top.offsetmonkey538.compactmobfarms.config.EntityTierResourceReloadListener;
 import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
+import top.offsetmonkey538.compactmobfarms.datagen.builtin.BuiltinPacksDatagen;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.group.ModItemGroups;
 import top.offsetmonkey538.compactmobfarms.loot.condition.ModLootConditionTypes;
 import top.offsetmonkey538.compactmobfarms.network.ModPackets;
 import top.offsetmonkey538.compactmobfarms.recipe.ModRecipes;
 import top.offsetmonkey538.compactmobfarms.screen.ModScreenHandlers;
-import top.offsetmonkey538.monkeylib538.utils.EnchantmentUtils;
 import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
 
 public class CompactMobFarms implements ModInitializer {
 	public static final String MOD_ID = "compact-mob-farms";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	// Dev env or -DcompactMobFarmsDebug=true jvm arg
+	public static final boolean ENABLE_DEBUG = FabricLoader.getInstance().isDevelopmentEnvironment() || !System.getProperty("compactMobFarmsDebug", "").isEmpty();
 
 	@Override
 	public void onInitialize() {
@@ -63,13 +64,16 @@ public class CompactMobFarms implements ModInitializer {
 			tableBuilder.pool(pool);
 		});
 
-		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new EntityTierResourceReloadListener());
+		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(EntityTierResourceReloadListener.ID, EntityTierResourceReloadListener::new);
 
 		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
 			ServerPlayNetworking.send(player, new ModPackets.EntityTierListChanged(
-					EntityTiers.INSTANCE
+					EntityTiers.instance
 			));
 		});
+
+
+		BuiltinPacksDatagen.registerBuiltinPacks();
 	}
 
 	public static Identifier id(String path) {

@@ -38,6 +38,7 @@ public final class ModItemGroups {
             FabricItemGroup.builder()
                     .icon(ModItems.FILLED_SAMPLE_TAKER::getDefaultStack)
                     .displayName(Text.translatable("itemGroup.compact_mob_farms.filled_sample_takers_group"))
+                    // todo: check if mob in EntityTiers.INSTANCE before adding
                     .entries((displayContext, entries) -> SpawnEggItem.getAll().forEach(spawnEgg -> entries.add(ModItems.FILLED_SAMPLE_TAKER.forEntity(spawnEgg.getEntityType(ItemStack.EMPTY)))))
                     .build()
     );

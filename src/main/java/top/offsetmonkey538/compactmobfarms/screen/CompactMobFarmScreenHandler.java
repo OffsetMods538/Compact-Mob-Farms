@@ -2,10 +2,8 @@ package top.offsetmonkey538.compactmobfarms.screen;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,19 +11,16 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
@@ -98,7 +93,7 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
                     if (TierUpgradeItem.isSupported(blockEntity.getTierUpgrade(), entity)) return true;
 
                     blockEntity.sendPacket(new ModPackets.GuiDisplayProblemMessage(
-                            Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_insert_sample_taker", Text.translatable(entity.getTranslationKey()), EntityTiers.INSTANCE.requiredTierFor(entity))
+                            Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_insert_sample_taker", Text.translatable(entity.getTranslationKey()), EntityTiers.instance.requiredTierFor(entity).value)
                     ));
 
                     return false;
@@ -120,7 +115,7 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
                     if (blockEntity.getCurrentEntity() == null) return true;
                     final EntityType<?> currentType = blockEntity.getCurrentEntity().getType();
 
-                    if (EntityTiers.INSTANCE.isSupported(currentType) && EntityTiers.INSTANCE.tier0Supports(currentType))
+                    if (EntityTiers.instance.anySupports(currentType) && EntityTiers.instance.tier0Supports(currentType))
                         return true;
 
                     blockEntity.sendPacket(new ModPackets.GuiDisplayProblemMessage(

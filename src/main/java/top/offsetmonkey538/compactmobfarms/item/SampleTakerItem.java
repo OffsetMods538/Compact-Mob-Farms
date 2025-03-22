@@ -6,20 +6,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.component.ModComponents;
 import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
-import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +35,7 @@ public class SampleTakerItem extends Item {
         final List<UUID> samplesCollected = getSamplesCollected(stack);
         final UUID targetUuid = targetEntity.getUuid();
 
-        if (!EntityTiers.INSTANCE.isSupported(targetEntity.getType()) || samplesCollected.contains(targetUuid) || (sampledEntiyIdentifier != null && !sampledEntiyIdentifier.equals(targetEntityIdentifier))) {
+        if (!EntityTiers.instance.anySupports(targetEntity.getType()) || samplesCollected.contains(targetUuid) || (sampledEntiyIdentifier != null && !sampledEntiyIdentifier.equals(targetEntityIdentifier))) {
             System.out.println((user.getWorld().isClient() ? "client: " : "server: ") + "samples: " + samplesCollected.size() + " canceled\n");
             return super.useOnEntity(stack, user, targetEntity, hand);
         }
