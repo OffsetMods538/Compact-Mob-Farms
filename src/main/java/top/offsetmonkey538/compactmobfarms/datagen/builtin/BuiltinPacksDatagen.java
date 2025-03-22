@@ -44,7 +44,7 @@ public class BuiltinPacksDatagen {
 
         ARMADILLO_SCUTE("armadillo", Text.literal("CMF - Armadillo - Scutes"), 1, 2, EntityType.ARMADILLO, 0, Items.ARMADILLO_SCUTE),
         TURTLE("turtle", Text.literal("CMF - Turtle - Scutes"), 1, 2, EntityType.TURTLE, 1, Items.TURTLE_SCUTE),
-        BEE("bee", Text.literal("CMF - Bee - Honey and -combs"), 1, 1, EntityType.BEE, 0, Items.HONEY_BOTTLE, Items.HONEYCOMB),
+        BEE("bee", Text.literal("CMF - Bee - Honey and Combs"), 1, 1, EntityType.BEE, 0, Items.HONEY_BOTTLE, Items.HONEYCOMB),
         ENDER_DRAGON("ender_dragon", Text.literal("CMF - Ender Dragon - Breath"), 1, 2, EntityType.ENDER_DRAGON, 2, Items.DRAGON_BREATH),
         FROG("frog", Text.literal("CMF - Frog - Froglights"), 1, 3, EntityType.FROG, 0, Items.OCHRE_FROGLIGHT, Items.VERDANT_FROGLIGHT, Items.PEARLESCENT_FROGLIGHT),
         GOAT("goat", Text.literal("CMF - Goat - Horns"), 1, 2, EntityType.GOAT, 3, Items.GOAT_HORN),
@@ -99,7 +99,7 @@ public class BuiltinPacksDatagen {
         }
 
         public Identifier getId() {
-            return id(id);
+            return id("compact-mob-farms-builtin--%s".formatted(id));
         }
     }
 
