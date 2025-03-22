@@ -92,12 +92,20 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
 
                     if (TierUpgradeItem.isSupported(blockEntity.getTierUpgrade(), entity)) return true;
 
+                    final EntityTiers.Tier tier = EntityTiers.instance.requiredTierFor(entity);
                     blockEntity.sendPacket(new ModPackets.GuiDisplayProblemMessage(
-                            Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_insert_sample_taker", Text.translatable(entity.getTranslationKey()), EntityTiers.instance.requiredTierFor(entity).value)
+                            tier == EntityTiers.Tier.UNSUPPORTED ?
+                                    Text.translatable("general.compact_mob_farms.unsupported") :
+                                    Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_insert_sample_taker", Text.translatable(entity.getTranslationKey()), tier.value)
                     ));
 
                     return false;
                 }, false);
+            }
+
+            @Override
+            public boolean canTakeItems(PlayerEntity playerEntity) {
+                return super.canTakeItems(playerEntity);
             }
         });
 

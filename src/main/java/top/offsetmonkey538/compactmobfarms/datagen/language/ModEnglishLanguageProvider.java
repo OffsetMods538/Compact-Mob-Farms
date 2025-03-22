@@ -38,7 +38,8 @@ public class ModEnglishLanguageProvider extends FabricLanguageProvider {
 
         translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.amount", "Samples taken: %s");
         translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.type", "Sample type: %s");
-        translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.unsupported", "Unsupported");
         translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.required_tier", "Requires tier: %s");
+
+        translationBuilder.add("general.compact_mob_farms.unsupported", "Unsupported");
     }
 }

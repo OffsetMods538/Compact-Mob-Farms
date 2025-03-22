@@ -85,7 +85,7 @@ public class SampleTakerItem extends Item {
 
         if (tier == EntityTiers.Tier.UNSUPPORTED) {
             tooltip.add(Text.translatable(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.type", sampledEntity.getName()).formatted(Formatting.RED));
-            tooltip.add(Text.translatable(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.unsupported").formatted(Formatting.RED));
+            tooltip.add(Text.translatable("general.compact_mob_farms.unsupported").formatted(Formatting.RED));
             return;
         }
         tooltip.add(Text.translatable(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.type", sampledEntity.getName()));
