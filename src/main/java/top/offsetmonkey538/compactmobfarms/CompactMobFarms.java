@@ -66,11 +66,11 @@ public class CompactMobFarms implements ModInitializer {
 
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(EntityTierResourceReloadListener.ID, EntityTierResourceReloadListener::new);
 
-		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
-			ServerPlayNetworking.send(player, new ModPackets.EntityTierListChanged(
-					EntityTiers.instance
-			));
-		});
+		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) ->
+				ServerPlayNetworking.send(player, new ModPackets.EntityTierListChanged(
+						EntityTiers.instance
+				))
+		);
 
 
 		BuiltinPacksDatagen.registerBuiltinPacks();

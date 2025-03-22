@@ -11,7 +11,6 @@ import net.minecraft.util.Rarity;
 import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.block.ModBlocks;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
-import top.offsetmonkey538.compactmobfarms.component.ModComponents;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.CompactMobFarmUpgradeItem;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.DamageUpgradeItem;
 import top.offsetmonkey538.compactmobfarms.item.upgrade.SpeedUpgradeItem;

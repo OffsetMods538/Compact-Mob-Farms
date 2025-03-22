@@ -1,6 +1,5 @@
 package top.offsetmonkey538.compactmobfarms.block.entity;
 
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -13,7 +12,7 @@ public final class ModBlockEntityTypes {
 
     }
 
-    public static final BlockEntityType<CompactMobFarmBlockEntity> COMPACT_MOB_FARM = register(FabricBlockEntityTypeBuilder.create(CompactMobFarmBlockEntity::new, ModBlocks.COMPACT_MOB_FARM).build(), "compact_mob_farm");
+    public static final BlockEntityType<CompactMobFarmBlockEntity> COMPACT_MOB_FARM = register(BlockEntityType.Builder.create(CompactMobFarmBlockEntity::new, ModBlocks.COMPACT_MOB_FARM).build(), "compact_mob_farm");
 
     @SuppressWarnings("SameParameterValue")
     private static <T extends BlockEntityType<?>> T register(T block, String name) {

@@ -7,10 +7,8 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.component.ModComponents;
-import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
 
 import java.util.List;
 

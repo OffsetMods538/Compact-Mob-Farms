@@ -5,16 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -23,7 +19,6 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.RegistryWrapper;
 import org.jetbrains.annotations.NotNull;
-import top.offsetmonkey538.compactmobfarms.CompactMobFarms;
 
 public class CompactMobFarmInventory implements SlottedStorage<ItemVariant> {
     public static final Codec<CompactMobFarmInventory> CODEC = Codec.list(ItemStack.CODEC).xmap(CompactMobFarmInventory::new, inventory -> inventory.slots.stream().map(slot -> slot.stack).toList());

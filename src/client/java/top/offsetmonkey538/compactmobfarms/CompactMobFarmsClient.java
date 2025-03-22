@@ -103,15 +103,15 @@ public class CompactMobFarmsClient implements ClientModInitializer {
 			screen.displayProblemMessage(payload.problemMessage());
 		});
 
-		ClientPlayNetworking.registerGlobalReceiver(ModPackets.EntityTierListChanged.ID, (payload, context) -> {
-			EntityTiers.setInstance(new EntityTiers(
-					null, null,
-					payload.tier0(),
-					payload.tier1(),
-					payload.tier2(),
-					payload.tier3(),
-					payload.tier4()
-			));
-		});
+		ClientPlayNetworking.registerGlobalReceiver(ModPackets.EntityTierListChanged.ID, (payload, context) ->
+				EntityTiers.setInstance(new EntityTiers(
+						null, null,
+						payload.tier0(),
+						payload.tier1(),
+						payload.tier2(),
+						payload.tier3(),
+						payload.tier4()
+				))
+		);
 	}
 }

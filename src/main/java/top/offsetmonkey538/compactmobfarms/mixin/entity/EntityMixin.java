@@ -20,8 +20,7 @@ public abstract class EntityMixin implements EntityAccessor {
             method = "dropStack(Lnet/minecraft/item/ItemStack;F)Lnet/minecraft/entity/ItemEntity;",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/ItemEntity;<init>(Lnet/minecraft/world/World;DDDLnet/minecraft/item/ItemStack;)V",
-                    shift = At.Shift.BEFORE
+                    target = "Lnet/minecraft/entity/ItemEntity;<init>(Lnet/minecraft/world/World;DDDLnet/minecraft/item/ItemStack;)V"
             ),
             cancellable = true
     )

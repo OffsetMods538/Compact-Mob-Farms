@@ -39,7 +39,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -136,7 +135,7 @@ public class CompactMobFarmBlockEntity extends BlockEntity implements ExtendedSc
             if (CompactMobFarmBlockEntity.this.world == null) return;
             CompactMobFarmBlockEntity.this.world.updateListeners(pos, getCachedState(), getCachedState(), Block.NOTIFY_LISTENERS);
         }
-    };;
+    };
     private final SimpleInventory sword = new SimpleInventory(1) {
         @Override
         public int getMaxCountPerStack() {

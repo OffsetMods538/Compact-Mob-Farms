@@ -1,7 +1,7 @@
 package top.offsetmonkey538.compactmobfarms.datagen;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
+
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
@@ -13,7 +13,6 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.recipe.FilledSampleTakerCloningRecipe;
-import top.offsetmonkey538.compactmobfarms.recipe.ModRecipes;
 
 public class ModRecipeProvider extends FabricRecipeProvider {
     public ModRecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {

@@ -31,6 +31,20 @@ public class CompactMobFarmBlockEntityRenderer implements BlockEntityRenderer<Co
         final Entity entity = entityType.create(blockEntity.getWorld());
         if (!(entity instanceof LivingEntity)) return;
 
+        final float scale = getScale(entity);
+
+        matrices.push();
+
+        matrices.translate(0.5f, 0.31f, 0.5f);
+        matrices.scale(scale, scale, scale);
+        matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(blockEntity.getCachedState().get(Properties.HORIZONTAL_FACING).asRotation()));
+
+        MinecraftClient.getInstance().getEntityRenderDispatcher().render(entity, 0, 0, 0, 0, 0, matrices, vertexConsumers, light);
+
+        matrices.pop();
+    }
+
+    private static float getScale(Entity entity) {
         final Box boundingBox = entity.getBoundingBox();
 
         final float entityWidth = (float) (boundingBox.maxX - boundingBox.minX);
@@ -45,16 +59,6 @@ public class CompactMobFarmBlockEntityRenderer implements BlockEntityRenderer<Co
                 )
         );
 
-        final float scale = 0.45f / size;
-
-        matrices.push();
-
-        matrices.translate(0.5f, 0.31f, 0.5f);
-        matrices.scale(scale, scale, scale);
-        matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(blockEntity.getCachedState().get(Properties.HORIZONTAL_FACING).asRotation()));
-
-        MinecraftClient.getInstance().getEntityRenderDispatcher().render(entity, 0, 0, 0, 0, 0, matrices, vertexConsumers, light);
-
-        matrices.pop();
+        return 0.45f / size;
     }
 }

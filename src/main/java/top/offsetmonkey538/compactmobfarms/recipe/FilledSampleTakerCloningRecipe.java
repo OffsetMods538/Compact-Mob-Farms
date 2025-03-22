@@ -1,14 +1,11 @@
 package top.offsetmonkey538.compactmobfarms.recipe;
 
-import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;

@@ -1,6 +1,6 @@
 package top.offsetmonkey538.compactmobfarms.mixin.entity;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import java.util.function.Consumer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.world.ServerWorld;

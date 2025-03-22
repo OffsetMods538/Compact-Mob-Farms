@@ -78,12 +78,12 @@ public record EntityTiers(
 
     public static final class Builder {
         private Integer priority = null;
-        private List<EntityType<?>> unsupported = new ArrayList<>();
-        private List<EntityType<?>> tier0 = new ArrayList<>();
-        private List<EntityType<?>> tier1 = new ArrayList<>();
-        private List<EntityType<?>> tier2 = new ArrayList<>();
-        private List<EntityType<?>> tier3 = new ArrayList<>();
-        private List<EntityType<?>> tier4 = new ArrayList<>();
+        private final List<EntityType<?>> unsupported = new ArrayList<>();
+        private final List<EntityType<?>> tier0 = new ArrayList<>();
+        private final List<EntityType<?>> tier1 = new ArrayList<>();
+        private final List<EntityType<?>> tier2 = new ArrayList<>();
+        private final List<EntityType<?>> tier3 = new ArrayList<>();
+        private final List<EntityType<?>> tier4 = new ArrayList<>();
 
         public EntityTiers build() {
             return new EntityTiers(priority, unsupported, tier0, tier1, tier2, tier3, tier4);
