@@ -93,7 +93,7 @@ public class CompactMobFarmScreenHandler extends ScreenHandler {
                     if (TierUpgradeItem.isSupported(blockEntity.getTierUpgrade(), entity)) return true;
 
                     blockEntity.sendPacket(new ModPackets.GuiDisplayProblemMessage(
-                            Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_insert_sample_taker", Text.translatable(entity.getTranslationKey()), EntityTiers.instance.requiredTierFor(entity))
+                            Text.translatable(ModBlocks.COMPACT_MOB_FARM.getTranslationKey() + ".unable_to_insert_sample_taker", Text.translatable(entity.getTranslationKey()), EntityTiers.instance.requiredTierFor(entity).value)
                     ));
 
                     return false;

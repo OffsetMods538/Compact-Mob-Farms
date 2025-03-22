@@ -63,11 +63,17 @@ public record EntityTiers(
     }
 
     public enum Tier {
-        TIER_0,
-        TIER_1,
-        TIER_2,
-        TIER_3,
-        TIER_4
+        UNSUPPORTED(-1),
+        TIER_0(0),
+        TIER_1(1),
+        TIER_2(2),
+        TIER_3(3),
+        TIER_4(4);
+        public final int value;
+
+        Tier(int value) {
+            this.value = value;
+        }
     }
 
     public static final class Builder {
@@ -171,13 +177,13 @@ public record EntityTiers(
         return tier4Supports(entity);
     }
     public Tier requiredTierFor(EntityType<?> entity) {
-        if (!anySupports(entity)) return null;
+        if (!anySupports(entity)) return Tier.UNSUPPORTED;
         if (tier0.contains(entity)) return Tier.TIER_0;
         if (tier1.contains(entity)) return Tier.TIER_1;
         if (tier2.contains(entity)) return Tier.TIER_2;
         if (tier3.contains(entity)) return Tier.TIER_3;
         if (tier4.contains(entity)) return Tier.TIER_4;
-        return null;
+        return Tier.UNSUPPORTED;
     }
 
     @Override
