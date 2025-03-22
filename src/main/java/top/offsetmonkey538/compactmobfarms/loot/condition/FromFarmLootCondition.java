@@ -12,7 +12,7 @@ import net.minecraft.loot.context.LootContextParameters;
 import top.offsetmonkey538.compactmobfarms.block.entity.CompactMobFarmBlockEntity;
 
 import java.util.Set;
-//todo: test if actually works
+
 public class FromFarmLootCondition implements LootCondition {
     private static final FromFarmLootCondition INSTANCE = new FromFarmLootCondition();
     public static final MapCodec<FromFarmLootCondition> CODEC = MapCodec.unit(INSTANCE);
