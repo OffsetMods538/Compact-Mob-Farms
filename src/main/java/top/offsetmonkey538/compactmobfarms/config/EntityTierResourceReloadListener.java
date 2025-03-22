@@ -110,7 +110,7 @@ public class EntityTierResourceReloadListener extends JsonDataLoader implements 
         // Sort list by priority value
         tierLists.sort(Comparator.comparingInt(entityTiers -> {
             assert entityTiers.priority() != null; // Loaded using EntityTiers.FILE_CODEC, which should ensure it's not null.
-            return -entityTiers.priority(); // Negative as higher priority should apply later and overwrite previous ones.
+            return entityTiers.priority();
         }));
 
         // Apply tier configs in order to a map of entity to tier. This way each entity will keep the last tier added.
