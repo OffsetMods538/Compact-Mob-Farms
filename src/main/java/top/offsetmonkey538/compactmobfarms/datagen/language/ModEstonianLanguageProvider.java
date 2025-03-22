@@ -38,5 +38,7 @@ public class ModEstonianLanguageProvider extends FabricLanguageProvider {
 
         translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.amount", "Proove võetud: %s");
         translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.type", "Proovi tüüp: %s");
+        translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.unsupported", "Pole toetatud");
+        translationBuilder.add(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.required_tier", "Vajab taset: %s");
     }
 }

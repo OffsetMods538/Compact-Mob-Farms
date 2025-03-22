@@ -6,9 +6,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import top.offsetmonkey538.compactmobfarms.component.ModComponents;
+import top.offsetmonkey538.compactmobfarms.config.EntityTiers;
 
 import java.util.List;
 
@@ -22,10 +24,17 @@ public class FilledSampleTakerItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         final EntityType<?> sampledEntity = getSampledEntityType(stack);
-
         if (sampledEntity == null) return;
 
+        final EntityTiers.Tier tier = EntityTiers.instance.requiredTierFor(sampledEntity);
+
+        if (tier == EntityTiers.Tier.UNSUPPORTED) {
+            tooltip.add(Text.translatable(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.type", sampledEntity.getName()).formatted(Formatting.RED));
+            tooltip.add(Text.translatable(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.unsupported").formatted(Formatting.RED));
+            return;
+        }
         tooltip.add(Text.translatable(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.type", sampledEntity.getName()));
+        tooltip.add(Text.translatable(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.required_tier", tier.value));
     }
 
     public static void setSampledEntity(ItemStack stack, Identifier entity) {

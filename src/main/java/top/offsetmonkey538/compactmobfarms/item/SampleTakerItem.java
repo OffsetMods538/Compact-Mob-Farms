@@ -9,6 +9,7 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -80,8 +81,17 @@ public class SampleTakerItem extends Item {
 
         if (samplesCollected.isEmpty() || sampledEntity == null) return;
 
+        final EntityTiers.Tier tier = EntityTiers.instance.requiredTierFor(sampledEntity);
+
+        if (tier == EntityTiers.Tier.UNSUPPORTED) {
+            tooltip.add(Text.translatable(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.type", sampledEntity.getName()).formatted(Formatting.RED));
+            tooltip.add(Text.translatable(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.unsupported").formatted(Formatting.RED));
+            return;
+        }
+        tooltip.add(Text.translatable(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.type", sampledEntity.getName()));
+        tooltip.add(Text.translatable(ModItems.SAMPLE_TAKER.getTranslationKey() + ".tooltip.required_tier", tier.value));
+
         tooltip.add(Text.translatable(getTranslationKey() + ".tooltip.amount", samplesCollected.size()));
-        tooltip.add(Text.translatable(getTranslationKey() + ".tooltip.type", sampledEntity.getName()));
     }
 
     public static void setSampledEntity(ItemStack stack, Identifier entity) {
