@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.loot.LootPool;
@@ -35,6 +36,8 @@ import top.offsetmonkey538.monkeylib538.utils.IdentifierUtils;
 public class CompactMobFarms implements ModInitializer {
 	public static final String MOD_ID = "compact-mob-farms";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	// Dev env or -DcompactMobFarmsDebug=true jvm arg
+	public static final boolean ENABLE_DEBUG = FabricLoader.getInstance().isDevelopmentEnvironment() || !System.getProperty("compactMobFarmsDebug", "").isEmpty();
 
 	@Override
 	public void onInitialize() {

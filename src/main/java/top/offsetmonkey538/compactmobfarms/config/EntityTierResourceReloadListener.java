@@ -28,6 +28,8 @@ public class EntityTierResourceReloadListener extends JsonDataLoader implements 
     public static final Identifier ID = id(NAME);
 
     private static final Path OVERRIDES_PATH = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID + "/overrides.json");
+    private static final Path EXPORT_PATH = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID + "/export.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final RegistryOps<JsonElement> ops;
 
@@ -44,11 +46,6 @@ public class EntityTierResourceReloadListener extends JsonDataLoader implements 
     @Override
     protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, Profiler profiler) {
         LOGGER.info("Loading entity tiers...");
-
-        // Get list of entity tier configs
-        // Sort list by priority value
-        // Apply tier configs in order to a map of entity to tier. This way each entity will keep the last tier added.
-        // Turn map into an actual EntityTiers instance storing lists for each tier.
 
         // Get list of entity tier configs
         final List<EntityTiers> tierLists = new ArrayList<>();
@@ -82,11 +79,8 @@ public class EntityTierResourceReloadListener extends JsonDataLoader implements 
         LOGGER.info("Loading overrides config from '{}'...", OVERRIDES_PATH);
 
         EntityTiers overrides = new EntityTiers(Integer.MAX_VALUE, ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
-        final Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
         try {
-            final JsonElement json = JsonHelper.deserialize(gson, Files.newBufferedReader(OVERRIDES_PATH), JsonElement.class);
+            final JsonElement json = JsonHelper.deserialize(GSON, Files.newBufferedReader(OVERRIDES_PATH), JsonElement.class);
             overrides = EntityTiers.FILE_CODEC.parse(ops, json).resultOrPartial(LOGGER::error).orElse(overrides);
             tierLists.add(overrides);
         } catch (IOException e) {
@@ -101,7 +95,7 @@ public class EntityTierResourceReloadListener extends JsonDataLoader implements 
             final JsonElement json = result.resultOrPartial(LOGGER::error).orElse(new JsonObject());
             try {
                 Files.createDirectories(OVERRIDES_PATH.getParent());
-                Files.writeString(OVERRIDES_PATH, gson.toJson(json));
+                Files.writeString(OVERRIDES_PATH, GSON.toJson(json));
             } catch (IOException e) {
                 LOGGER.error("Failed to save overrides config!", e);
             }
@@ -141,6 +135,18 @@ public class EntityTierResourceReloadListener extends JsonDataLoader implements 
             }
         }
         EntityTiers.setInstance(new EntityTiers(null, null, tier0, tier1, tier2, tier3, tier4));
+
+        // Write final entity tiers for debug
+        if (!ENABLE_DEBUG) return;
+        LOGGER.warn("Exporting entity tiers to '{}'.", EXPORT_PATH);
+        final DataResult<JsonElement> result = EntityTiers.EXPORT_CODEC.encodeStart(ops, EntityTiers.instance);
+        final JsonElement json = result.resultOrPartial(LOGGER::error).orElse(new JsonObject());
+        try {
+            Files.createDirectories(EXPORT_PATH.getParent());
+            Files.writeString(EXPORT_PATH, GSON.toJson(json));
+        } catch (IOException e) {
+            LOGGER.error("Failed to export entity tiers!", e);
+        }
     }
 
     private <K, V> void addToListMap(Map<K, List<V>> map, K key, V value) {

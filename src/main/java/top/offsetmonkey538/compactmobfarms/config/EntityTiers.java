@@ -33,6 +33,13 @@ public record EntityTiers(
             Registries.ENTITY_TYPE.getCodec().listOf().fieldOf("tier4").forGetter(EntityTiers::tier4)
             ).apply(instance, EntityTiers::new)
     );
+    public static final Codec<EntityTiers> EXPORT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Registries.ENTITY_TYPE.getCodec().listOf().fieldOf("tier0").forGetter(EntityTiers::tier0),
+            Registries.ENTITY_TYPE.getCodec().listOf().fieldOf("tier1").forGetter(EntityTiers::tier1),
+            Registries.ENTITY_TYPE.getCodec().listOf().fieldOf("tier2").forGetter(EntityTiers::tier2),
+            Registries.ENTITY_TYPE.getCodec().listOf().fieldOf("tier3").forGetter(EntityTiers::tier3),
+            Registries.ENTITY_TYPE.getCodec().listOf().fieldOf("tier4").forGetter(EntityTiers::tier4)
+    ).apply(instance, ((tier0, tier1, tier2, tier3, tier4) -> new EntityTiers(null, null, tier0, tier1, tier2, tier3, tier4))));
 
     public EntityTiers(
             @Nullable Integer priority,
