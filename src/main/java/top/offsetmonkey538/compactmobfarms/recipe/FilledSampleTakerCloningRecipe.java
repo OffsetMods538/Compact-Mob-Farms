@@ -10,6 +10,7 @@ import net.minecraft.world.World;
 import top.offsetmonkey538.compactmobfarms.item.ModItems;
 import top.offsetmonkey538.compactmobfarms.item.SampleTakerItem;
 
+// todo: EMI compat for this
 public class FilledSampleTakerCloningRecipe extends SpecialCraftingRecipe {
     public FilledSampleTakerCloningRecipe(CraftingRecipeCategory category) {
         super(category);
@@ -28,6 +29,7 @@ public class FilledSampleTakerCloningRecipe extends SpecialCraftingRecipe {
             if (stack.isOf(ModItems.FILLED_SAMPLE_TAKER)) {
                 if (foundFilledSampleTaker) return false;
                 foundFilledSampleTaker = true;
+                continue;
             }
 
             if (stack.isOf(ModItems.SAMPLE_TAKER)) {
@@ -35,12 +37,16 @@ public class FilledSampleTakerCloningRecipe extends SpecialCraftingRecipe {
 
                 if (foundEmptySampleTaker) return false;
                 foundEmptySampleTaker = true;
+                continue;
             }
 
             if (stack.isOf(ModItems.SPIRIT_BOTTLE)) {
                 if (foundSpiritBottle) return false;
                 foundSpiritBottle = true;
+                continue;
             }
+
+            return false;
         }
 
         return foundFilledSampleTaker &&
